@@ -4,6 +4,14 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+
+env:
+  apiUsername: ${{ secrets.apiUsername }}
+  apiPassword: ${{ secrets.apiPassword }}
+  staffPassword: ${{ secrets.staffPassword }}
+  MAILOSAURAPIKEY: ${{ secrets.MAILOSAURAPIKEY }}
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+
 jobs:
   test:
     timeout-minutes: 60
@@ -19,11 +27,6 @@ jobs:
       run: npx playwright install --with-deps
     - name: Run Playwright tests
       run: npx playwright test
-      env:
-        apiUsername: ${{ secrets.apiUsername }}
-        apiPassword: ${{ secrets.apiPassword }}
-        staffPassword: ${{ secrets.staffPassword }}
-        MAILOSAURAPIKEY: ${{ secrets.MAILOSAURAPIKEY }}
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
