@@ -20,7 +20,7 @@ test('Check login. @login', async ({ page }) => {
 
 test('LoginByPass @login @smoke', async ({ page, request }) => {
 
-await generalCommands.loginAPI(page, request)
+await generalCommands.loginAPI(page, request, staffEmail)
 await generalCommands.loadFeatureFlags(page);
 
 });

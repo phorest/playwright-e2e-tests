@@ -11,6 +11,6 @@ _...link here the JIRA ticket number if you have..._
 _...link here the Testiny ticket number if you have..._
 
 ### :white_check_mark: Todos before accepting the PR:
-- [ ] If data/test change is needed it is done
+- [ ] It passed on CI
 - [ ] Jira ticket is linked 
 - [ ] Testiny link added

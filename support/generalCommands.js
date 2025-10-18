@@ -5,12 +5,12 @@ import path from 'path'
 
 class generalCommands {
     // Login
-    async loginAPI(page, request) {
+    async loginAPI(page, request, staffEmail) {
         const response = await request.post(Salon.TOKEN_URL, {
             data: {
                 "grant_type": "basic",
                 "client_type": "user",
-                "username": Salon.staff[0].email,
+                "username": staffEmail,
                 "password": process.env.staffPassword
             }
         });

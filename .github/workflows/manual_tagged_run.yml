@@ -1,4 +1,4 @@
-name: Playwright Tests - DEV
+name: Manual tagged run
 on:
   # It will triggered when there is a pull request applied on the following branches:
   pull_request:
@@ -14,26 +14,27 @@ on:
         default: '@login'
         
 jobs:
-  test:
+  preparation:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
       with:
         node-version: 18
     - name: Install dependencies
       run: npm ci
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
+  test:
     - name: Run Playwright tests
       run: npx playwright test --grep ${{ github.event.inputs.tags }}
       env:
         apiUsername: ${{ secrets.apiUsername }}
         apiPassword: ${{ secrets.apiPassword }}
-        staffEmail: ${{ secrets.staffEmail }}
         staffPassword: ${{ secrets.staffPassword }}
         MAILOSAURAPIKEY: ${{ secrets.MAILOSAURAPIKEY }}
+  prepare-reports:
     - uses: actions/upload-artifact@v4
       if: always()
       with:
