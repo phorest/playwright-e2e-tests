@@ -19,6 +19,13 @@ jobs:
       run: npx playwright install --with-deps
     - name: Run Playwright tests
       run: npx playwright test
+      env:
+        REVISION_KEY: ${{ secrets.REVISION_KEY }}
+        apiUsername: ${{ secrets.apiUsername }}
+        apiPassword: ${{ secrets.apiPassword }}
+        staffEmail: ${{ secrets.staffEmail }}
+        staffPassword: ${{ secrets.staffPassword }}
+        MAILOSAURAPIKEY: ${{ secrets.MAILOSAURAPIKEY }}
     - uses: actions/upload-artifact@latest
       if: ${{ !cancelled() }}
       with:
