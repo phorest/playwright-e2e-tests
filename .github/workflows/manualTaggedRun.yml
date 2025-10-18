@@ -34,7 +34,6 @@ jobs:
         apiPassword: ${{ secrets.apiPassword }}
         staffPassword: ${{ secrets.staffPassword }}
         MAILOSAURAPIKEY: ${{ secrets.MAILOSAURAPIKEY }}
-  reports:
     - name: Prepare reports
     - uses: actions/upload-artifact@v4
       if: always()
