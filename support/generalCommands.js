@@ -10,7 +10,7 @@ class generalCommands {
             data: {
                 "grant_type": "basic",
                 "client_type": "user",
-                "username": process.env.staffEmail,
+                "username": Salon.staff[0].email,
                 "password": process.env.staffPassword
             }
         });

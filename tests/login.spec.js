@@ -4,7 +4,7 @@ import { loginLocators } from '../locators/login/login.locators.js';
 import { Salon } from '../testData/salonData.js';
 import generalCommands from '../support/generalCommands.js';
 
-const staffEmail = process.env.staffEmail;
+const staffEmail = Salon.staff[0].email;
 const staffPassword = process.env.staffPassword;
 
 test('Check login. @login', async ({ page }) => {
@@ -15,9 +15,10 @@ test('Check login. @login', async ({ page }) => {
   await page.locator(loginLocators.passwordInput).fill(staffPassword);
   await page.locator(loginLocators.signInButton).click();
   await expect(page).toHaveURL('a/' + Salon.ACCOUNT_ID + '/appointments');
+  
 });
 
-test('LoginByPass @login', async ({ page, request }) => {
+test('LoginByPass @login @smoke', async ({ page, request }) => {
 
 await generalCommands.loginAPI(page, request)
 await generalCommands.loadFeatureFlags(page);
