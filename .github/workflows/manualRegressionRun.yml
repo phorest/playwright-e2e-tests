@@ -1,0 +1,47 @@
+name: Manual tagged run
+on:
+  # It will triggered when there is a pull request applied on the following branches:
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      feature-flag:
+        description: Enter Feature Flag -> Comma separated
+        required: false
+        default: ''
+      revision-key:
+        description: Enter Revision Key
+        required: false
+        default:  ''
+
+env:
+  apiUsername: ${{ secrets.apiUsername }}
+  apiPassword: ${{ secrets.apiPassword }}
+  staffPassword: ${{ secrets.staffPassword }}
+  MAILOSAURAPIKEY: ${{ secrets.MAILOSAURAPIKEY }}
+  FEATURE_FLAG: ${{ github.event.inputs.feature-flag }}
+  REVISION_KEY: ${{ github.event.inputs.revision-key }}
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 18
+    - name: Add feature flags
+      run: node ./cypress/support/utils/add_feature_flags.js ${{ env.FEATURE_FLAG }}
+    - name: Install dependencies
+      run: npm ci
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
+    - name: Run Playwright tests
+      run: npx playwright test
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 5

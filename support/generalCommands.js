@@ -30,11 +30,11 @@ class generalCommands {
             localStorage.setItem('access-token', token);
         }, tokenValue);
 
-        await page.goto('/');
+        await this.checkRevisionKey(page);
     }
 
-        async checkRevisionKey(page) {
-        let revisionKey = "";
+    async checkRevisionKey(page) {
+        const revisionKey = process.env.REVISION_KEY;
         if (!revisionKey) {
             await page.goto('/');
         } else {
