@@ -1,4 +1,4 @@
-name: Manual tagged run
+name: Manual regression run
 on:
   # It will triggered when there is a pull request applied on the following branches:
   pull_request:
@@ -32,7 +32,7 @@ jobs:
       with:
         node-version: 18
     - name: Add feature flags
-      run: node ./cypress/support/utils/add_feature_flags.js ${{ env.FEATURE_FLAG }}
+      run: node ./support/utils/add_feature_flags.js ${{ env.FEATURE_FLAG }}
     - name: Install dependencies
       run: npm ci
     - name: Install Playwright Browsers
