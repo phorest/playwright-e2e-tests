@@ -10,7 +10,6 @@ env:
   apiPassword: ${{ secrets.apiPassword }}
   staffPassword: ${{ secrets.staffPassword }}
   MAILOSAURAPIKEY: ${{ secrets.MAILOSAURAPIKEY }}
-  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
 
 jobs:
   test:
@@ -26,7 +25,7 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Run Playwright tests
-      run: npx playwright test
+      run: PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npx playwright test
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:

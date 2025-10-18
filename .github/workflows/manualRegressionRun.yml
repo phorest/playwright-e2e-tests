@@ -21,7 +21,6 @@ env:
   MAILOSAURAPIKEY: ${{ secrets.MAILOSAURAPIKEY }}
   FEATURE_FLAG: ${{ github.event.inputs.feature-flag }}
   REVISION_KEY: ${{ github.event.inputs.revision-key }}
-  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
   
 jobs:
   test:
