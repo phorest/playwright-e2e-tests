@@ -2,59 +2,64 @@
 import { test, expect, request } from "@playwright/test";
 import { testData } from "../../../testData/salonData.js";
 import generalCommands from "../../../support/generalCommands.js";
-import { voucher } from "../../../support/graphQL/queries/voucher.query.js";
+import voucherRequests from "../../../support/requests/voucher.requests.js";
 
-const staffEmail = testData.IRELAND_SALON.staff[0].email;
-const staffPassword = process.env.staffPassword;
-const testAutomationClientID = "LZEAhkK0pRZZPJ7agub91A";
-const issueDate = new Date(
-  new Date().getFullYear(),
-  new Date().getMonth(),
-  new Date().getDate()
-)
-  .toJSON()
-  .slice(0, 10);
-const expiryDate = new Date(
-  new Date().getFullYear() + 1,
-  new Date().getMonth(),
-  new Date().getDate()
-)
-  .toJSON()
-  .slice(0, 10);
+// Test configuration
+const TEST_CONFIG = {
+  staffEmail: testData.IRELAND_SALON.staff[0].email,
+  staffPassword: process.env.staffPassword,
+  testAutomationClientID: "LZEAhkK0pRZZPJ7agub91A",
+};
 
-test("Create new voucher with GraphQL @voucher", async ({ page, request }) => {
-  await generalCommands.loginByPass(page, request, staffEmail, staffPassword);
-  await generalCommands.loadFeatureFlags(page);
+// Helper functions
+const getCurrentDate = () => {
+  return new Date(
+    new Date().getFullYear(),
+    new Date().getMonth(),
+    new Date().getDate()
+  )
+    .toJSON()
+    .slice(0, 10);
+};
 
-  const createVoucherInput = {
+const getFutureDate = () => {
+  return new Date(
+    new Date().getFullYear() + 1,
+    new Date().getMonth(),
+    new Date().getDate()
+  )
+    .toJSON()
+    .slice(0, 10);
+};
+
+const createVoucherData = () => {
+  return {
     input: {
-      clientId: testAutomationClientID,
-      issueDate: String(issueDate),
-      expiryDate: String(expiryDate),
+      clientId: TEST_CONFIG.testAutomationClientID,
+      issueDate: String(getCurrentDate()),
+      expiryDate: String(getFutureDate()),
       serial: String(Date.now()),
       originalBalance: "500",
       remainingBalance: "500",
       notes: "Test Notes",
     },
   };
+};
 
+// Test implementation
+test("Create new voucher with GraphQL @voucher", async ({ page, request }) => {
+  // Setup
+  await generalCommands.loginByPass(page, request, TEST_CONFIG.staffEmail, TEST_CONFIG.staffPassword);
+  await generalCommands.loadFeatureFlags(page);
+
+  // Test data preparation
+  const voucherData = createVoucherData();
   const token = await generalCommands.getAccessToken(page);
   
-  const voucherCreationResponse = await request.post(testData.URL.GRAPHQL_URL, {
-    headers: {
-      authorization: `Bearer ${token}`,
-      "x-memento-security-context":
-        testData.IRELAND_SALON.BUSINESS_ID +
-        "|" +
-        testData.IRELAND_SALON.BRANCH_ID +
-        "|" +
-        testData.IRELAND_SALON.staff[0].id,
-    },
-    data: {
-      query: voucher.createVoucher,
-      variables: createVoucherInput,
-    },
-  });
-  await expect(voucherCreationResponse.ok()).toBeTruthy();
-  await expect(voucherCreationResponse.status()).toBe(200);
+  // Execute request
+  const response = await voucherRequests.createVoucher(request, token, voucherData);
+  
+  // Assertions
+  await expect(response.ok()).toBeTruthy();
+  await expect(response.status()).toBe(200);
 });
