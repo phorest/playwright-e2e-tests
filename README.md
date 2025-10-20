@@ -15,7 +15,7 @@ E2E test automation project using Playwright for testing web applications.
 1. Fork this repository to your GitHub account
 2. Clone your forked repository:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/playwright-e2e-tests.git
+   git clone https://github.com/phorest/playwright-e2e-tests.git
    cd playwright-e2e-tests
    ```
 
