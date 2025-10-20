@@ -1,8 +1,5 @@
 name: Manual regression run
 on:
-  # It will triggered when there is a pull request applied on the following branches:
-  pull_request:
-    branches: [ main, master ]
   workflow_dispatch:
     inputs:
       feature-flag:
