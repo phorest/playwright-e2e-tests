@@ -8,6 +8,7 @@ on:
         options:
         - '@login'
         - '@smoke'
+        - '@voucher'
         default: '@login'
 env:
   apiUsername: ${{ secrets.apiUsername }}
