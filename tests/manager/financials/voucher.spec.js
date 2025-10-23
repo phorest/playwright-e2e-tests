@@ -15,6 +15,7 @@ import generalCommands from "../../../support/generalCommands.js";
 import { voucher } from "../../../support/graphQL/queries/voucher.query.js";
 import { client } from "../../../support/graphQL/queries/client.query.js";
 import { voucherLocators } from "../../../locators/manager/financials/voucher.locators.js";
+import apiRequests from "../../../support/requests/api.requests.js";
 
 // Test configuration and credentials
 const staffEmail = testData.IRELAND_SALON.staff[0].email;
@@ -83,25 +84,7 @@ test("Create new client voucher UI; use it; archive it; @voucher", async ({
   // ===== PHASE 1: TEST DATA SETUP =====
   const serialNumber = String(Date.now()); // Unique serial number
   const todayDate = String(getCurrentDatePlusOne()); // Issue date (tomorrow)
-  const futureDate = String(getFutureDate()); // Expiry date (one year from now)
 
-  const createClientInput = {
-    input: {
-      firstName: "TestUser",
-      lastName: "Voucher",
-      email: "test@test.com",
-      mobile: "0897656433",
-      marketingEmailOptout: true,
-      marketingSmsOptout: true,
-      referringClientId: null,
-      clientSourceId: null,
-      preferredStaffId: null,
-      linkedClientId: null,
-      awardReferralPoints: false,
-      address: {},
-      marketingOptinAnswered: false,
-    },
-  };
   // ===== PHASE 2: AUTHENTICATION AND SETUP =====
   await generalCommands.loginByPass(page, request, staffEmail, staffPassword);
   await generalCommands.loadFeatureFlags(page);
@@ -110,45 +93,16 @@ test("Create new client voucher UI; use it; archive it; @voucher", async ({
   const token = await generalCommands.getAccessToken(page);
 
   // ===== PHASE 2.1: CREATE CLIENT VIA GRAPHQL API =====
-  const clientCreationResponse = await request.post(testData.URL.GRAPHQL_URL, {
-    headers: {
-      authorization: `Bearer ${token}`,
-      "x-memento-security-context":
-        testData.IRELAND_SALON.BUSINESS_ID +
-        "|" +
-        testData.IRELAND_SALON.BRANCH_ID +
-        "|" +
-        testData.IRELAND_SALON.staff[0].id,
-    },
-    data: {
-      query: client.createClient,
-      variables: createClientInput,
-    },
-  });
+  const clientInfo = await apiRequests.createTestClient(
+    request, 
+    token, 
+    "TestUser", 
+    "Voucher", 
+    "test@test.com", 
+    "0897656433"
+  );
   
-  // Verify client creation was successful
-  await expect(clientCreationResponse.ok()).toBeTruthy();
-  await expect(clientCreationResponse.status()).toBe(200);
-
-  // Parse and validate response data
-  let responseData, clientId, clientFirstName, clientLastName;
-  try {
-    responseData = await clientCreationResponse.json();
-    
-    // Validate response structure
-    if (!responseData.data?.createClient?.client?.id) {
-      throw new Error("Client creation failed - no ID returned in response");
-    }
-    
-    clientId = responseData.data.createClient.client.id;
-    clientFirstName = responseData.data.createClient.client.firstName;
-    clientLastName = responseData.data.createClient.client.lastName;
-    
-    console.log(`✅ Created client: ${clientFirstName} ${clientLastName} (ID: ${clientId})`);
-  } catch (error) {
-    console.error("❌ Failed to create client:", error);
-    throw new Error(`Client creation failed: ${error.message}`);
-  }
+  const { id: clientId, firstName: clientFirstName, lastName: clientLastName } = clientInfo;
 
   // ===== PHASE 3: NAVIGATE TO VOUCHER CREATION =====
   await page.locator(voucherLocators.managerLink).click();
@@ -260,30 +214,5 @@ test("Create new client voucher UI; use it; archive it; @voucher", async ({
   ).toContainText(serialNumber);
 
   // ===== PHASE 10: CLEANUP - FORGET CLIENT =====
-  try {
-    const forgetClientResponse = await request.post(testData.URL.GRAPHQL_URL, {
-      headers: {
-        authorization: `Bearer ${token}`,
-        "x-memento-security-context":
-          testData.IRELAND_SALON.BUSINESS_ID +
-          "|" +
-          testData.IRELAND_SALON.BRANCH_ID +
-          "|" +
-          testData.IRELAND_SALON.staff[0].id,
-      },
-      data: {
-        query: client.forgetClient,
-        variables: {
-          clientId: clientId,
-        },
-      },
-    });
-    
-    await expect(forgetClientResponse.ok()).toBeTruthy();
-    await expect(forgetClientResponse.status()).toBe(200);
-    console.log(`✅ Successfully cleaned up client: ${clientFirstName} ${clientLastName} (ID: ${clientId})`);
-  } catch (error) {
-    console.error(`❌ Failed to cleanup client ${clientId}:`, error);
-    // Don't fail the test for cleanup errors, but log them
-  }
+  await apiRequests.forgetClient(request, token, clientId);
 });
