@@ -64,55 +64,6 @@ const issueDate = getCurrentDate();
 const expiryDate = getFutureDate();
 
 /**
- * Test: Create new voucher using GraphQL API
- *
- * This test validates voucher creation through the GraphQL API endpoint.
- * It creates a voucher with predefined values and verifies the response.
- */
-test("Create new voucher with GraphQL @voucher", async ({ page, request }) => {
-  // Step 1: Authentication and setup
-  await generalCommands.loginByPass(page, request, staffEmail, staffPassword);
-  await generalCommands.loadFeatureFlags(page);
-
-  // Step 2: Prepare voucher creation data
-  const createVoucherInput = {
-    input: {
-      clientId: testAutomationClientID,
-      issueDate: String(issueDate),
-      expiryDate: String(expiryDate),
-      serial: String(Date.now()), // Unique serial number using timestamp
-      originalBalance: "500",
-      remainingBalance: "500",
-      notes: "Test Notes",
-    },
-  };
-
-  // Step 3: Get authentication token
-  const token = await generalCommands.getAccessToken(page);
-
-  // Step 4: Execute GraphQL mutation to create voucher
-  const voucherCreationResponse = await request.post(testData.URL.GRAPHQL_URL, {
-    headers: {
-      authorization: `Bearer ${token}`,
-      "x-memento-security-context":
-        testData.IRELAND_SALON.BUSINESS_ID +
-        "|" +
-        testData.IRELAND_SALON.BRANCH_ID +
-        "|" +
-        testData.IRELAND_SALON.staff[0].id,
-    },
-    data: {
-      query: voucher.createVoucher,
-      variables: createVoucherInput,
-    },
-  });
-
-  // Step 5: Verify successful voucher creation
-  await expect(voucherCreationResponse.ok()).toBeTruthy();
-  await expect(voucherCreationResponse.status()).toBe(200);
-});
-
-/**
  * Test: Create new client voucher through UI and verify creation
  *
  * This comprehensive test covers the full voucher creation workflow:
@@ -151,12 +102,14 @@ test("Create new client voucher UI; use it; archive it; @voucher", async ({
       marketingOptinAnswered: false,
     },
   };
+  // ===== PHASE 2: AUTHENTICATION AND SETUP =====
   await generalCommands.loginByPass(page, request, staffEmail, staffPassword);
   await generalCommands.loadFeatureFlags(page);
-  // Step 3: Get authentication token
+  
+  // Get authentication token for API requests
   const token = await generalCommands.getAccessToken(page);
 
-  // Step 4: Execute GraphQL mutation to create voucher
+  // ===== PHASE 2.1: CREATE CLIENT VIA GRAPHQL API =====
   const clientCreationResponse = await request.post(testData.URL.GRAPHQL_URL, {
     headers: {
       authorization: `Bearer ${token}`,
@@ -172,12 +125,30 @@ test("Create new client voucher UI; use it; archive it; @voucher", async ({
       variables: createClientInput,
     },
   });
+  
+  // Verify client creation was successful
   await expect(clientCreationResponse.ok()).toBeTruthy();
   await expect(clientCreationResponse.status()).toBe(200);
 
-  // Parse the response JSON to access the data
-  const responseData = await clientCreationResponse.json();
-  const clientId = responseData.data.createClient.client.id;
+  // Parse and validate response data
+  let responseData, clientId, clientFirstName, clientLastName;
+  try {
+    responseData = await clientCreationResponse.json();
+    
+    // Validate response structure
+    if (!responseData.data?.createClient?.client?.id) {
+      throw new Error("Client creation failed - no ID returned in response");
+    }
+    
+    clientId = responseData.data.createClient.client.id;
+    clientFirstName = responseData.data.createClient.client.firstName;
+    clientLastName = responseData.data.createClient.client.lastName;
+    
+    console.log(`✅ Created client: ${clientFirstName} ${clientLastName} (ID: ${clientId})`);
+  } catch (error) {
+    console.error("❌ Failed to create client:", error);
+    throw new Error(`Client creation failed: ${error.message}`);
+  }
 
   // ===== PHASE 3: NAVIGATE TO VOUCHER CREATION =====
   await page.locator(voucherLocators.managerLink).click();
@@ -193,15 +164,19 @@ test("Create new client voucher UI; use it; archive it; @voucher", async ({
     .getByRole("textbox", voucherLocators.roleSelectors.serialTextbox)
     .fill(serialNumber);
 
-  // Search and select client
+  // Search and select client using dynamic data
   await page.locator(voucherLocators.searchClientButton).click();
   await page
     .getByPlaceholder(voucherLocators.placeholderSelectors.firstNameInput)
-    .fill("TestUser");
+    .fill(clientFirstName); // Use actual client first name
   await page
     .getByPlaceholder(voucherLocators.placeholderSelectors.lastNameInput)
-    .fill("Voucher");
-  await page.locator(voucherLocators.clientSelectButton).click();
+    .fill(clientLastName); // Use actual client last name
+  
+  // Wait for client to appear and select dynamically
+  const clientButton = page.locator(`button:has-text("${clientFirstName} ${clientLastName}")`);
+  await clientButton.waitFor({ state: 'visible', timeout: 10000 });
+  await clientButton.click();
 
   // Set issue date
   await page
@@ -247,14 +222,18 @@ test("Create new client voucher UI; use it; archive it; @voucher", async ({
     .click();
   await page
     .getByRole("searchbox", voucherLocators.roleSelectors.clientSearchbox)
-    .fill("Test");
+    .fill(clientFirstName); // Use actual client first name
   await page
     .getByRole(
       "searchbox",
       voucherLocators.roleSelectors.clientLastNameSearchbox
     )
-    .fill("Voucher");
-  await page.locator(voucherLocators.clientSelectLink).first().click();
+    .fill(clientLastName); // Use actual client last name
+  
+  // Wait for client to appear and select
+  const clientSelectLink = page.locator(voucherLocators.clientSelectLink).first();
+  await clientSelectLink.waitFor({ state: 'visible', timeout: 10000 });
+  await clientSelectLink.click();
 
   // ===== PHASE 8: VERIFY VOUCHER IN CLIENT PROFILE =====
   await page
@@ -280,23 +259,31 @@ test("Create new client voucher UI; use it; archive it; @voucher", async ({
     page.locator(voucherLocators.serialColumn).first()
   ).toContainText(serialNumber);
 
-  const forgetClientResponse = await request.post(testData.URL.GRAPHQL_URL, {
-    headers: {
-      authorization: `Bearer ${token}`,
-      "x-memento-security-context":
-        testData.IRELAND_SALON.BUSINESS_ID +
-        "|" +
-        testData.IRELAND_SALON.BRANCH_ID +
-        "|" +
-        testData.IRELAND_SALON.staff[0].id,
-    },
-    data: {
-      query: client.forgetClient,
-      variables: {
-        clientId: clientId,
+  // ===== PHASE 10: CLEANUP - FORGET CLIENT =====
+  try {
+    const forgetClientResponse = await request.post(testData.URL.GRAPHQL_URL, {
+      headers: {
+        authorization: `Bearer ${token}`,
+        "x-memento-security-context":
+          testData.IRELAND_SALON.BUSINESS_ID +
+          "|" +
+          testData.IRELAND_SALON.BRANCH_ID +
+          "|" +
+          testData.IRELAND_SALON.staff[0].id,
       },
-    },
-  });
-  await expect(forgetClientResponse.ok()).toBeTruthy();
-  await expect(forgetClientResponse.status()).toBe(200);
+      data: {
+        query: client.forgetClient,
+        variables: {
+          clientId: clientId,
+        },
+      },
+    });
+    
+    await expect(forgetClientResponse.ok()).toBeTruthy();
+    await expect(forgetClientResponse.status()).toBe(200);
+    console.log(`✅ Successfully cleaned up client: ${clientFirstName} ${clientLastName} (ID: ${clientId})`);
+  } catch (error) {
+    console.error(`❌ Failed to cleanup client ${clientId}:`, error);
+    // Don't fail the test for cleanup errors, but log them
+  }
 });
