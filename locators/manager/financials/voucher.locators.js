@@ -11,7 +11,7 @@ export const voucherLocators = {
   searchClientButton: 'button:has-text("Search for a client")',
   firstNamePlaceholder: 'input[placeholder="First name, ID or Treatcard"]',
   lastNamePlaceholder: 'input[placeholder="Last name"]',
-  clientSelectButton: 'button:has-text("Test Voucher 0891231243 test@")',
+  clientSelectButton: 'button:has-text("TestUser Voucher 0897656433 test@")',
   issueDateTextbox: { name: "Issue Date Open calendar" },
   notesTextbox: { name: "Notes" },
   saveButton: 'button:has-text("Save")',
