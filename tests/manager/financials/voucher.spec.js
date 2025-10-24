@@ -16,53 +16,18 @@ import { voucher } from "../../../support/graphQL/queries/voucher.query.js";
 import { client } from "../../../support/graphQL/queries/client.query.js";
 import { voucherLocators } from "../../../locators/manager/financials/voucher.locators.js";
 import apiRequests from "../../../support/requests/api.requests.js";
+import {
+  generateVoucherTestData,
+  getVoucherDates,
+} from "../../../support/utils/date.utils.js";
 
 // Test configuration and credentials
 const staffEmail = testData.IRELAND_SALON.staff[0].email;
 const staffPassword = process.env.staffPassword;
 const testAutomationClientID = "LZEAhkK0pRZZPJ7agub91A";
 
-/**
- * Date utility functions for voucher creation
- * These functions generate dates in YYYY-MM-DD format for voucher issue and expiry dates
- */
-
-// Get current date (today)
-const getCurrentDate = () => {
-  return new Date(
-    new Date().getFullYear(),
-    new Date().getMonth(),
-    new Date().getDate()
-  )
-    .toJSON()
-    .slice(0, 10);
-};
-
-// Get current date plus one day (tomorrow)
-const getCurrentDatePlusOne = () => {
-  return new Date(
-    new Date().getFullYear(),
-    new Date().getMonth(),
-    new Date().getDate() + 1
-  )
-    .toJSON()
-    .slice(0, 10);
-};
-
-// Get future date (one year from now)
-const getFutureDate = () => {
-  return new Date(
-    new Date().getFullYear() + 1,
-    new Date().getMonth(),
-    new Date().getDate()
-  )
-    .toJSON()
-    .slice(0, 10);
-};
-
-// Pre-calculate dates for voucher creation
-const issueDate = getCurrentDate();
-const expiryDate = getFutureDate();
+// Pre-calculate dates for voucher creation (using utility functions)
+const { issueDate, expiryDate } = getVoucherDates();
 
 /**
  * Test: Create new client voucher through UI and verify creation
@@ -82,8 +47,7 @@ test("Create new client voucher UI; use it; archive it; @voucher", async ({
   request,
 }) => {
   // ===== PHASE 1: TEST DATA SETUP =====
-  const serialNumber = String(Date.now()); // Unique serial number
-  const todayDate = String(getCurrentDatePlusOne()); // Issue date (tomorrow)
+  const { serialNumber, issueDate: todayDate } = generateVoucherTestData();
 
   // ===== PHASE 2: AUTHENTICATION AND SETUP =====
   await generalCommands.loginByPass(page, request, staffEmail, staffPassword);
@@ -242,6 +206,26 @@ test("Create new client voucher UI; use it; archive it; @voucher", async ({
     .click();
   await page.getByRole("button", { name: "Ok" }).click();
   await page.getByRole("button", { name: "Complete Payment" }).click();
+
+  await page.getByRole("button", { name: "Close" }).click();
+  await page.locator("#main-nav-clients-link").click();
+  await page
+    .getByRole("searchbox", { name: "First name, ID or Treatcard" })
+    .click();
+  await page
+    .getByRole("searchbox", { name: "First name, ID or Treatcard" })
+    .fill("TestUser");
+  await page.getByRole("searchbox", { name: "Last name" }).click();
+  await page.getByRole("searchbox", { name: "Last name" }).fill("Voucher");
+
+  await page.getByRole("link", { name: "TestUser" }).click();
+  await page.getByRole("button", { name: "Vouchers" }).click();
+  await page.getByRole("button", { name: "Vouchers" }).click();
+  
+  // Verify remaining balance (€140.00)
+  await expect(
+    page.locator(voucherLocators.remainingBalanceColumn).first()
+  ).toContainText("€140.00");
 
   // ===== PHASE 10: CLEANUP - ARCHIVE VOUCHERS - FORGET CLIENT =====
   await apiRequests.bulkArchiveVouchers(request, token);
