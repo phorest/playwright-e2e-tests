@@ -244,6 +244,6 @@ test("Create new client voucher UI; use it; archive it; @voucher", async ({
   await page.getByRole("button", { name: "Complete Payment" }).click();
 
   // ===== PHASE 10: CLEANUP - ARCHIVE VOUCHERS - FORGET CLIENT =====
-  // await apiRequests.bulkArchiveVouchers(request, token);
-  // await apiRequests.forgetClient(request, token, clientId);
+  await apiRequests.bulkArchiveVouchers(request, token);
+  await apiRequests.forgetClient(request, token, clientId);
 });
