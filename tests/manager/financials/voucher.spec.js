@@ -88,21 +88,25 @@ test("Create new client voucher UI; use it; archive it; @voucher", async ({
   // ===== PHASE 2: AUTHENTICATION AND SETUP =====
   await generalCommands.loginByPass(page, request, staffEmail, staffPassword);
   await generalCommands.loadFeatureFlags(page);
-  
+
   // Get authentication token for API requests
   const token = await generalCommands.getAccessToken(page);
 
   // ===== PHASE 2.1: CREATE CLIENT VIA GRAPHQL API =====
   const clientInfo = await apiRequests.createTestClient(
-    request, 
-    token, 
-    "TestUser", 
-    "Voucher", 
-    "test@test.com", 
+    request,
+    token,
+    "TestUser",
+    "Voucher",
+    "test@test.com",
     "0897656433"
   );
-  
-  const { id: clientId, firstName: clientFirstName, lastName: clientLastName } = clientInfo;
+
+  const {
+    id: clientId,
+    firstName: clientFirstName,
+    lastName: clientLastName,
+  } = clientInfo;
 
   // ===== PHASE 3: NAVIGATE TO VOUCHER CREATION =====
   await page.locator(voucherLocators.managerLink).click();
@@ -126,10 +130,12 @@ test("Create new client voucher UI; use it; archive it; @voucher", async ({
   await page
     .getByPlaceholder(voucherLocators.placeholderSelectors.lastNameInput)
     .fill(clientLastName); // Use actual client last name
-  
+
   // Wait for client to appear and select dynamically
-  const clientButton = page.locator(`button:has-text("${clientFirstName} ${clientLastName}")`);
-  await clientButton.waitFor({ state: 'visible', timeout: 10000 });
+  const clientButton = page.locator(
+    `button:has-text("${clientFirstName} ${clientLastName}")`
+  );
+  await clientButton.waitFor({ state: "visible", timeout: 10000 });
   await clientButton.click();
 
   // Set issue date
@@ -183,10 +189,12 @@ test("Create new client voucher UI; use it; archive it; @voucher", async ({
       voucherLocators.roleSelectors.clientLastNameSearchbox
     )
     .fill(clientLastName); // Use actual client last name
-  
+
   // Wait for client to appear and select
-  const clientSelectLink = page.locator(voucherLocators.clientSelectLink).first();
-  await clientSelectLink.waitFor({ state: 'visible', timeout: 10000 });
+  const clientSelectLink = page
+    .locator(voucherLocators.clientSelectLink)
+    .first();
+  await clientSelectLink.waitFor({ state: "visible", timeout: 10000 });
   await clientSelectLink.click();
 
   // ===== PHASE 8: VERIFY VOUCHER IN CLIENT PROFILE =====
@@ -213,6 +221,29 @@ test("Create new client voucher UI; use it; archive it; @voucher", async ({
     page.locator(voucherLocators.serialColumn).first()
   ).toContainText(serialNumber);
 
-  // ===== PHASE 10: CLEANUP - FORGET CLIENT =====
-  await apiRequests.forgetClient(request, token, clientId);
+  await page.locator("#main-nav-purchase-link").click();
+  await page.getByPlaceholder("First name").click();
+  await page.getByPlaceholder("First name").fill("TestUser");
+  await page.getByRole("button", { name: "TV TestUser Voucher" }).click();
+  await page.getByRole("button", { name: "Dean Winchester's profile" }).click();
+  await page.getByRole("button", { name: "Services" }).click();
+  await page.getByRole("button", { name: "Colour" }).click();
+  await page.getByRole("button", { name: "Permanent €60.00 100min" }).click();
+  await page.getByRole("button", { name: "Pay" }).click();
+  await page.getByRole("button", { name: "Skip" }).click();
+  await page
+    .getByRole("button", { name: "Select till: No till selected" })
+    .click();
+  await page.getByText("Till 1").click();
+  await page.getByRole("button", { name: "OK" }).click();
+  await page.getByRole("button", { name: "Voucher - Balance: €" }).click();
+  await page
+    .getByRole("button", { name: "Voucher - " + serialNumber + " €" })
+    .click();
+  await page.getByRole("button", { name: "Ok" }).click();
+  await page.getByRole("button", { name: "Complete Payment" }).click();
+
+  // ===== PHASE 10: CLEANUP - ARCHIVE VOUCHERS - FORGET CLIENT =====
+  // await apiRequests.bulkArchiveVouchers(request, token);
+  // await apiRequests.forgetClient(request, token, clientId);
 });

@@ -1,6 +1,6 @@
 /**
  * Common API Request Utilities
- * 
+ *
  * This module provides reusable functions for GraphQL API requests
  * including client management, voucher operations, and error handling.
  */
@@ -52,9 +52,11 @@ class ApiRequests {
 
       // Parse and validate response
       const responseData = await response.json();
-      
+
       if (responseData.errors) {
-        throw new Error(`GraphQL errors: ${JSON.stringify(responseData.errors)}`);
+        throw new Error(
+          `GraphQL errors: ${JSON.stringify(responseData.errors)}`
+        );
       }
 
       return responseData;
@@ -74,7 +76,7 @@ class ApiRequests {
   async createClient(request, token, clientData) {
     try {
       console.log("🔄 Creating client...");
-      
+
       const responseData = await this.executeGraphQLRequest(
         request,
         token,
@@ -95,7 +97,9 @@ class ApiRequests {
         mobile: responseData.data.createClient.client.mobile,
       };
 
-      console.log(`✅ Created client: ${clientInfo.firstName} ${clientInfo.lastName} (ID: ${clientInfo.id})`);
+      console.log(
+        `✅ Created client: ${clientInfo.firstName} ${clientInfo.lastName} (ID: ${clientInfo.id})`
+      );
       return clientInfo;
     } catch (error) {
       console.error("❌ Failed to create client:", error);
@@ -113,7 +117,7 @@ class ApiRequests {
   async forgetClient(request, token, clientId) {
     try {
       console.log(`🔄 Forgetting client: ${clientId}`);
-      
+
       const responseData = await this.executeGraphQLRequest(
         request,
         token,
@@ -122,11 +126,14 @@ class ApiRequests {
       );
 
       // Debug: Log the full response structure
-      console.log("🔍 Forget client response data:", JSON.stringify(responseData, null, 2));
+      console.log(
+        "🔍 Forget client response data:",
+        JSON.stringify(responseData, null, 2)
+      );
 
       // The forgetClient mutation returns a boolean value directly
       const forgetResult = responseData.data?.forgetClient;
-      
+
       // Check if the operation was successful (returns true)
       if (forgetResult === true) {
         console.log(`✅ Successfully forgot client: ${clientId}`);
@@ -135,13 +142,17 @@ class ApiRequests {
 
       // If the result is false, the operation failed
       if (forgetResult === false) {
-        console.error(`❌ Client forget operation returned false for client: ${clientId}`);
+        console.error(
+          `❌ Client forget operation returned false for client: ${clientId}`
+        );
         return false;
       }
 
       // Handle null/undefined responses (might indicate success in some APIs)
       if (forgetResult === null || forgetResult === undefined) {
-        console.log(`✅ Client forget operation completed (null response) for: ${clientId}`);
+        console.log(
+          `✅ Client forget operation completed (null response) for: ${clientId}`
+        );
         return true;
       }
 
@@ -149,7 +160,6 @@ class ApiRequests {
       console.warn(`⚠️ Unexpected forget client response:`, forgetResult);
       console.log(`✅ Assuming success for client: ${clientId}`);
       return true;
-      
     } catch (error) {
       console.error(`❌ Failed to forget client ${clientId}:`, error);
       // Don't throw error for cleanup operations - just log and return false
@@ -167,7 +177,7 @@ class ApiRequests {
   async createVoucher(request, token, voucherData) {
     try {
       console.log("🔄 Creating voucher...");
-      
+
       const responseData = await this.executeGraphQLRequest(
         request,
         token,
@@ -183,13 +193,17 @@ class ApiRequests {
       const voucherInfo = {
         id: responseData.data.createVoucher.voucher.id,
         serial: responseData.data.createVoucher.voucher.serial,
-        originalBalance: responseData.data.createVoucher.voucher.originalBalance,
-        remainingBalance: responseData.data.createVoucher.voucher.remainingBalance,
+        originalBalance:
+          responseData.data.createVoucher.voucher.originalBalance,
+        remainingBalance:
+          responseData.data.createVoucher.voucher.remainingBalance,
         issueDate: responseData.data.createVoucher.voucher.issueDate,
         expiryDate: responseData.data.createVoucher.voucher.expiryDate,
       };
 
-      console.log(`✅ Created voucher: ${voucherInfo.serial} (ID: ${voucherInfo.id})`);
+      console.log(
+        `✅ Created voucher: ${voucherInfo.serial} (ID: ${voucherInfo.id})`
+      );
       return voucherInfo;
     } catch (error) {
       console.error("❌ Failed to create voucher:", error);
@@ -207,7 +221,7 @@ class ApiRequests {
   async getClient(request, token, clientId) {
     try {
       console.log(`🔄 Retrieving client: ${clientId}`);
-      
+
       const responseData = await this.executeGraphQLRequest(
         request,
         token,
@@ -228,7 +242,9 @@ class ApiRequests {
         mobile: responseData.data.getClient.client.mobile,
       };
 
-      console.log(`✅ Retrieved client: ${clientInfo.firstName} ${clientInfo.lastName} (ID: ${clientInfo.id})`);
+      console.log(
+        `✅ Retrieved client: ${clientInfo.firstName} ${clientInfo.lastName} (ID: ${clientInfo.id})`
+      );
       return clientInfo;
     } catch (error) {
       console.error("❌ Failed to retrieve client:", error);
@@ -246,7 +262,14 @@ class ApiRequests {
    * @param {string} mobile - Client mobile number
    * @returns {Promise<Object>} Created client data
    */
-  async createTestClient(request, token, firstName = "TestUser", lastName = "Voucher", email = "test@test.com", mobile = "0897656433") {
+  async createTestClient(
+    request,
+    token,
+    firstName = "TestUser",
+    lastName = "Voucher",
+    email = "test@test.com",
+    mobile = "0897656433"
+  ) {
     const clientData = {
       firstName,
       lastName,
@@ -264,6 +287,25 @@ class ApiRequests {
     };
 
     return await this.createClient(request, token, clientData);
+  }
+
+  async bulkArchiveVouchers(request, token) {
+    const responseData = await this.executeGraphQLRequest(
+      request,
+      token,
+      voucher.archiveVoucher,
+      {
+        bulkRequest: {
+          selectionMode: "SELECT_ALL",
+          selectedIds: [],
+          unselectedIds: [],
+        },
+        archive: true,
+        filterBy: {
+          positiveRemainingBalance: true,
+        },
+      }
+    );
   }
 }
 
