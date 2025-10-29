@@ -28,7 +28,7 @@ jobs:
         run: npm i
 
       - name: Cleanup appointments
-        run: node ./cypress/support/utils/cleanup_appointments.js dev_us
+        run: node ./support/utils/cleanup_appointments.js dev_us
 
   test:
     name: 🧪 E2E Tests
