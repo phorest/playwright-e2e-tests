@@ -24,10 +24,12 @@ import {
 // Test configuration and credentials
 const staffEmail = testData.IRELAND_SALON.staff[0].email;
 const staffPassword = process.env.staffPassword;
-const testAutomationClientID = "LZEAhkK0pRZZPJ7agub91A";
 
 // Pre-calculate dates for voucher creation (using utility functions)
 const { issueDate, expiryDate } = getVoucherDates();
+// Global variables for test data sharing
+let globalToken;
+let globalClientId;
 
 /**
  * Test: Create new client voucher through UI and verify creation
@@ -42,6 +44,7 @@ const { issueDate, expiryDate } = getVoucherDates();
  *
  * Note: This test creates a voucher for an existing test client
  */
+
 test("Create new client voucher UI; use it; archive it; @voucher", async ({
   page,
   request,
@@ -55,6 +58,7 @@ test("Create new client voucher UI; use it; archive it; @voucher", async ({
 
   // Get authentication token for API requests
   const token = await generalCommands.getAccessToken(page);
+  globalToken = token; // Store for cleanup
 
   // ===== PHASE 2.1: CREATE CLIENT VIA GRAPHQL API =====
   const clientInfo = await apiRequests.createTestClient(
@@ -71,6 +75,8 @@ test("Create new client voucher UI; use it; archive it; @voucher", async ({
     firstName: clientFirstName,
     lastName: clientLastName,
   } = clientInfo;
+
+  globalClientId = clientId; // Store for cleanup
 
   // ===== PHASE 3: NAVIGATE TO VOUCHER CREATION =====
   await page.locator(voucherLocators.managerLink).click();
@@ -221,13 +227,28 @@ test("Create new client voucher UI; use it; archive it; @voucher", async ({
   await page.getByRole("link", { name: "TestUser" }).click();
   await page.getByRole("button", { name: "Vouchers" }).click();
   await page.getByRole("button", { name: "Vouchers" }).click();
-  
+
   // Verify remaining balance (€140.00)
   await expect(
     page.locator(voucherLocators.remainingBalanceColumn).first()
   ).toContainText("€140.00");
+});
 
-  // ===== PHASE 10: CLEANUP - ARCHIVE VOUCHERS - FORGET CLIENT =====
-  await apiRequests.bulkArchiveVouchers(request, token);
-  await apiRequests.forgetClient(request, token, clientId);
+test.afterAll(async ({ request }) => {
+  console.log("🧹 Cleaning up test data...");
+
+  // ===== CLEANUP - FORGET CLIENT =====
+  if (globalToken && globalClientId) {
+    try {
+      await apiRequests.forgetClient(request, globalToken, globalClientId);
+      console.log("✅ Test cleanup completed successfully");
+    } catch (error) {
+      console.error("❌ Test cleanup failed:", error);
+    }
+  } else {
+    console.warn("⚠️ No cleanup data available - token or client ID missing");
+  }
+
+  // ===== CLEANUP - BULK ARCHIVE VOUCHERS =====
+  await apiRequests.bulkArchiveVouchers(request, globalToken);
 });
