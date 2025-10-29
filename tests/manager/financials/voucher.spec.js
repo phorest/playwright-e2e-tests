@@ -15,6 +15,7 @@ import generalCommands from "../../../support/generalCommands.js";
 import { voucher } from "../../../support/graphQL/queries/voucher.query.js";
 import { client } from "../../../support/graphQL/queries/client.query.js";
 import { voucherLocators } from "../../../locators/manager/financials/voucher.locators.js";
+import { purchaseLocators } from "../../../locators/purchase/purchase.locators.js";
 import apiRequests from "../../../support/requests/api.requests.js";
 import {
   generateVoucherTestData,
@@ -46,6 +47,12 @@ let globalClientId;
  * 9. Complete the payment process with voucher
  * 10. Verify voucher balance reduction after usage
  * 11. Clean up test data (client and vouchers)
+ * 
+ * Technical improvements:
+ * - Centralized locators for maintainability
+ * - Dynamic data usage throughout the test
+ * - Comprehensive error handling and cleanup
+ * - Clear phase separation with documentation
  *
  * This test validates the complete voucher workflow from creation to usage,
  * ensuring proper integration between voucher management and purchase systems.
@@ -197,42 +204,58 @@ test("Create new client voucher on the UI; purchase it; use it; archive it; @vou
     page.locator(voucherLocators.serialColumn).first()
   ).toContainText(serialNumber);
 
-  await page.locator("#main-nav-purchase-link").click();
-  await page.getByPlaceholder("First name").click();
-  await page.getByPlaceholder("First name").fill("TestUser");
-  await page.getByRole("button", { name: "TV TestUser Voucher" }).click();
-  await page.getByRole("button", { name: "Dean Winchester's profile" }).click();
-  await page.getByRole("button", { name: "Services" }).click();
-  await page.getByRole("button", { name: "Colour" }).click();
-  await page.getByRole("button", { name: "Permanent €60.00 100min" }).click();
-  await page.getByRole("button", { name: "Pay" }).click();
-  await page.getByRole("button", { name: "Skip" }).click();
-  await page
-    .getByRole("button", { name: "Select till: No till selected" })
-    .click();
-  await page.getByText("Till 1").click();
-  await page.getByRole("button", { name: "OK" }).click();
-  await page.getByRole("button", { name: "Voucher - Balance: €" }).click();
-  await page
-    .getByRole("button", { name: "Voucher - " + serialNumber + " €" })
-    .click();
-  await page.getByRole("button", { name: "Ok" }).click();
-  await page.getByRole("button", { name: "Complete Payment" }).click();
+  // ===== PHASE 10: PURCHASE SERVICE USING VOUCHER =====
+  await page.locator(purchaseLocators.purchaseLink).click();
+  await page.getByPlaceholder(purchaseLocators.placeholderSelectors.firstNameInput).click();
+  await page.getByPlaceholder(purchaseLocators.placeholderSelectors.firstNameInput).fill(clientFirstName);
+  
+  // Use dynamic client button selector
+  const purchaseClientButton = page.locator(purchaseLocators.getClientButton(clientFirstName, clientLastName));
+  await purchaseClientButton.click();
+  
+  await page.getByRole("button", purchaseLocators.roleSelectors.staffProfileButton).click();
+  await page.getByRole("button", purchaseLocators.roleSelectors.servicesButton).click();
+  await page.getByRole("button", purchaseLocators.roleSelectors.colourServiceButton).click();
+  await page.getByRole("button", purchaseLocators.roleSelectors.permanentServiceButton).click();
+  await page.getByRole("button", purchaseLocators.roleSelectors.payButton).click();
+  await page.getByRole("button", purchaseLocators.roleSelectors.skipButton).click();
+  await page.getByRole("button", purchaseLocators.roleSelectors.tillSelectionButton).click();
+  await page.getByText(purchaseLocators.textSelectors.till1Option).click();
+  await page.getByRole("button", purchaseLocators.roleSelectors.okButton).click();
+  await page.getByRole("button", purchaseLocators.roleSelectors.voucherBalanceButton).click();
+  
+  // Use dynamic voucher selection button
+  const voucherSelectionButton = page.locator(purchaseLocators.getVoucherSelectionButton(serialNumber));
+  await voucherSelectionButton.click();
+  
+  await page.getByRole("button", purchaseLocators.roleSelectors.voucherOkButton).click();
+  await page.getByRole("button", purchaseLocators.roleSelectors.completePaymentButton).click();
 
-  await page.getByRole("button", { name: "Close" }).click();
-  await page.locator("#main-nav-clients-link").click();
+  // ===== PHASE 11: VERIFY VOUCHER USAGE =====
+  await page.getByRole("button", purchaseLocators.roleSelectors.closeButton).click();
+  await page.locator(purchaseLocators.clientsLink).click();
   await page
-    .getByRole("searchbox", { name: "First name, ID or Treatcard" })
+    .getByRole("searchbox", voucherLocators.roleSelectors.clientSearchbox)
     .click();
   await page
-    .getByRole("searchbox", { name: "First name, ID or Treatcard" })
-    .fill("TestUser");
-  await page.getByRole("searchbox", { name: "Last name" }).click();
-  await page.getByRole("searchbox", { name: "Last name" }).fill("Voucher");
+    .getByRole("searchbox", voucherLocators.roleSelectors.clientSearchbox)
+    .fill(clientFirstName); // Use dynamic client first name
+  await page.getByRole("searchbox", voucherLocators.roleSelectors.clientLastNameSearchbox).click();
+  await page.getByRole("searchbox", voucherLocators.roleSelectors.clientLastNameSearchbox).fill(clientLastName);
 
-  await page.getByRole("link", { name: "TestUser" }).click();
-  await page.getByRole("button", { name: "Vouchers" }).click();
-  await page.getByRole("button", { name: "Vouchers" }).click();
+  // Use dynamic client link selector with fallback
+  try {
+    const clientLink = page.locator(purchaseLocators.getClientLink(clientFirstName));
+    await clientLink.waitFor({ state: 'visible', timeout: 5000 });
+    await clientLink.click();
+  } catch (error) {
+    console.log(`⚠️ Client link not found with firstName "${clientFirstName}", trying alternative selector...`);
+    // Fallback to the original hardcoded selector
+    await page.getByRole("link", { name: clientFirstName }).click();
+  }
+  
+  await page.getByRole("button", purchaseLocators.roleSelectors.vouchersTabButton).click();
+  await page.getByRole("button", purchaseLocators.roleSelectors.vouchersTabButton).click();
 
   // Verify remaining balance (€140.00)
   await expect(
@@ -247,19 +270,25 @@ test.afterAll(async ({ request }) => {
   if (globalToken && globalClientId) {
     try {
       await apiRequests.forgetClient(request, globalToken, globalClientId);
-      console.log("✅ Test cleanup completed successfully");
+      console.log("✅ Client cleanup completed successfully");
     } catch (error) {
-      console.error("❌ Test cleanup failed:", error);
+      console.error("❌ Client cleanup failed:", error);
     }
   } else {
-    console.warn("⚠️ No cleanup data available - token or client ID missing");
+    console.warn("⚠️ No client cleanup data available - token or client ID missing");
   }
 
   // ===== CLEANUP - BULK ARCHIVE VOUCHERS =====
-  try {
-    await apiRequests.bulkArchiveVouchers(request, globalToken);
-    console.log("✅ Vouchers archived successfully");
-  } catch (error) {
-    console.error("❌ Failed to archive vouchers:", error);
+  if (globalToken) {
+    try {
+      await apiRequests.bulkArchiveVouchers(request, globalToken);
+      console.log("✅ Vouchers archived successfully");
+    } catch (error) {
+      console.error("❌ Failed to archive vouchers:", error);
+    }
+  } else {
+    console.warn("⚠️ No token available for voucher cleanup");
   }
+  
+  console.log("🧹 Test cleanup completed");
 });
