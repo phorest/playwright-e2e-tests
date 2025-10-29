@@ -32,20 +32,26 @@ let globalToken;
 let globalClientId;
 
 /**
- * Test: Create new client voucher through UI and verify creation
+ * Test: Complete Voucher Lifecycle - Create, Purchase, Use, and Verify
  *
- * This comprehensive test covers the full voucher creation workflow:
- * 1. Navigate to voucher management
- * 2. Create a new voucher with client selection
- * 3. Fill voucher details (serial, dates, balance, notes)
- * 4. Save and verify success messages
- * 5. Navigate to client management
- * 6. Search for the client and verify voucher details
+ * This comprehensive end-to-end test covers the full voucher lifecycle:
+ * 1. Create a new test client via GraphQL API
+ * 2. Navigate to voucher management and create a new voucher
+ * 3. Fill voucher details (serial, dates, balance, notes) and save
+ * 4. Verify voucher creation success messages
+ * 5. Navigate to client management and verify voucher appears
+ * 6. Verify voucher details (balance, serial number)
+ * 7. Navigate to purchase system and select the client
+ * 8. Purchase a service using the voucher as payment method
+ * 9. Complete the payment process with voucher
+ * 10. Verify voucher balance reduction after usage
+ * 11. Clean up test data (client and vouchers)
  *
- * Note: This test creates a voucher for an existing test client
+ * This test validates the complete voucher workflow from creation to usage,
+ * ensuring proper integration between voucher management and purchase systems.
  */
 
-test("Create new client voucher UI; use it; archive it; @voucher", async ({
+test("Create new client voucher on the UI; purchase it; use it; archive it; @voucher", async ({
   page,
   request,
 }) => {
@@ -250,5 +256,10 @@ test.afterAll(async ({ request }) => {
   }
 
   // ===== CLEANUP - BULK ARCHIVE VOUCHERS =====
-  await apiRequests.bulkArchiveVouchers(request, globalToken);
+  try {
+    await apiRequests.bulkArchiveVouchers(request, globalToken);
+    console.log("✅ Vouchers archived successfully");
+  } catch (error) {
+    console.error("❌ Failed to archive vouchers:", error);
+  }
 });
