@@ -10,9 +10,9 @@ import { UserBuilder } from '../builders/UserBuilder.js';
 import { CardBuilder } from '../builders/CardBuilder.js';
 import { CategoryBuilder } from '../builders/CategoryBuilder.js';
 import { ContactInfoBuilder } from '../builders/ContactInfoBuilder.js';
-import { BookingPage } from '../pages/BookingPage.js';
-import { AppointmentsPage } from '../pages/AppointmentsPage.js';
-import { SettingsPage } from '../pages/SettingsPage.js';
+import { BookingService } from '../services/booking/booking.service.js';
+import { AppointmentsService } from '../services/appointments/appointments.service.js';
+import { SettingsService } from '../services/settings/settings.service.js';
 import {
   getAccessTokenFromLocalStorage,
   createStaffUserRest,
@@ -49,10 +49,10 @@ test('test_appointment', async ({ browser }) => {
   const page = await context.newPage();
 
   // Login and get booking link
-  const { LoginPage } = await import('../pages/LoginPage.js');
-  const loginPage = new LoginPage(page, DEV.baseUrl);
-  await loginPage.login(DEV.staffEmail, DEV.staffPassword);
-  const bookingLink = await loginPage.goToHomepageAfterLogin();
+  const LoginService = (await import('../services/login/login.service.js')).default;
+  const loginService = new LoginService(page, DEV.baseUrl);
+  await loginService.login(DEV.staffEmail, DEV.staffPassword);
+  const bookingLink = await loginService.goToHomepageAfterLogin();
 
   // Create staff and get token
   const result = await createStaffTokenAndId(page, context, bookingLink);
@@ -71,50 +71,50 @@ test('test_appointment', async ({ browser }) => {
     // Open booking page
     const bookingTab = await context.newPage();
     await bookingTab.goto(bookingLink);
-    const bookingPage = new BookingPage(bookingTab);
+    const bookingService = new BookingService(bookingTab);
 
-    await bookingPage.verifyContactInfo(contactInfo);
-    await bookingPage.selectServiceAndBook(category);
-    await bookingPage.selectStaffAndTime(staff);
+    await bookingService.verifyContactInfo(contactInfo);
+    await bookingService.selectServiceAndBook(category);
+    await bookingService.selectStaffAndTime(staff);
 
-    await bookingPage.createAccount(user);
-    await bookingPage.verifyRegistrationSuccess();
-    await bookingPage.fillCard(card);
-    await bookingPage.verifyBooking(service.name, staff, service.price);
+    await bookingService.createAccount(user);
+    await bookingService.verifyRegistrationSuccess();
+    await bookingService.fillCard(card);
+    await bookingService.verifyBooking(service.name, staff, service.price);
 
     await bookingTab.close();
     await page.bringToFront();
 
-    const apptPage = new AppointmentsPage(page);
-    await apptPage.goto();
-    await apptPage.makeCashPaymentByPhone(user.phone);
+    const apptService = new AppointmentsService(page);
+    await apptService.goto();
+    await apptService.makeCashPaymentByPhone(user.phone);
 
-    // TODO: Add ClientsPage when migrated
-    // const clientsPage = new ClientsPage(page);
-    // await clientsPage.searchForClients(user);
-    // await clientsPage.verifyHistoryRow(bookingPage.appointment, true);
-    // await clientsPage.verifySpendTotal(bookingPage.appointment);
+    // TODO: Add ClientsService when migrated
+    // const clientsService = new ClientsService(page);
+    // await clientsService.searchForClients(user);
+    // await clientsService.verifyHistoryRow(bookingService.appointment, true);
+    // await clientsService.verifySpendTotal(bookingService.appointment);
 
-    await apptPage.verifyAndUndoPaymentByClientName(user.name);
-    await apptPage.deleteBookingByPhone(user.phone);
+    await apptService.verifyAndUndoPaymentByClientName(user.name);
+    await apptService.deleteBookingByPhone(user.phone);
 
-    const settings = new SettingsPage(page);
-    await settings.openContactInfo();
-    await settings.verifyBranchContactDetails(contactInfo);
-    await settings.openOpeningHours();
-    await settings.verifyWeeklyHours(contactInfo);
+    const settingsService = new SettingsService(page);
+    await settingsService.openContactInfo();
+    await settingsService.verifyBranchContactDetails(contactInfo);
+    await settingsService.openOpeningHours();
+    await settingsService.verifyWeeklyHours(contactInfo);
 
-    // TODO: Add ClientsPage when migrated
-    // await clientsPage.searchForClients(user);
-    // await clientsPage.verifyClientDetails(user);
+    // TODO: Add ClientsService when migrated
+    // await clientsService.searchForClients(user);
+    // await clientsService.verifyClientDetails(user);
 
-    bookingPage.appointment.setPrice(0);
-    // await clientsPage.searchForClients(user);
-    // await clientsPage.verifyHistoryRow(bookingPage.appointment, false);
-    // await clientsPage.verifySpendTotal(bookingPage.appointment);
+    bookingService.appointment.setPrice(0);
+    // await clientsService.searchForClients(user);
+    // await clientsService.verifyHistoryRow(bookingService.appointment, false);
+    // await clientsService.verifySpendTotal(bookingService.appointment);
 
-    // await clientsPage.searchForClients(user);
-    // await clientsPage.forgetClient(user);
+    // await clientsService.searchForClients(user);
+    // await clientsService.forgetClient(user);
   } finally {
     // Cleanup
     if (cleanup) {

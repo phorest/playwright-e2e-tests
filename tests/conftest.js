@@ -4,7 +4,7 @@
  */
 import base from '@playwright/test';
 import { setActiveEnv, getActiveEnv } from '../config/runtime.js';
-import LoginPage from '../pages/LoginPage.js';
+import LoginService from '../services/login/login.service.js';
 
 export const test = base.extend({
     /**
@@ -28,10 +28,9 @@ export const test = base.extend({
         await context.tracing.start({ screenshots: true, snapshots: true, sources: true });
 
         // Login + booking link
-        const login = new LoginPage(page, env.baseUrl);
+        const login = new LoginService(page, env.baseUrl);
         await login.login(env.staffEmail, env.staffPassword);
-        // Uwaga: metoda nazywa się go_to_homepage_after_login w naszej wersji JS
-        const bookingLink = await login.go_to_homepage_after_login();
+        const bookingLink = await login.goToHomepageAfterLogin();
 
         try {
             await use({ page, context, bookingLink });
