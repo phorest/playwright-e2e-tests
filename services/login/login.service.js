@@ -1,5 +1,5 @@
 /**
- * LoginService - JavaScript version of pages/LoginPage.py
+ * LoginService
  */
 
 import { getActiveEnv } from '../../config/runtime.js';

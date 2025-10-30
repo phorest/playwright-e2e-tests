@@ -1,6 +1,6 @@
 /*
 /!**
- * test_service_memberships.spec.js - JavaScript version of tests/test_service_memberships.py
+ * test_service_memberships.spec.js
  *!/
 
 import { test, expect } from '@playwright/test';

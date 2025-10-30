@@ -1,5 +1,5 @@
 /**
- * StaffBuilder - JavaScript version of builders/StaffBuilder.py
+ * StaffBuilder
  */
 
 import { Staff } from '../models/Staff.js';

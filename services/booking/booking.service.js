@@ -1,5 +1,5 @@
 /**
- * BookingService - JavaScript version of pages/BookingPage.py
+ * BookingService
  */
 
 import { expect } from '@playwright/test';

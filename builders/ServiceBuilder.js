@@ -1,5 +1,5 @@
 /**
- * ServiceBuilder - JavaScript version of builders/ServiceBuilder.py
+ * ServiceBuilder
  */
 
 import { Service } from '../models/Service.js';

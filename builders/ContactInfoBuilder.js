@@ -1,5 +1,5 @@
 /**
- * ContactInfoBuilder - JavaScript version of builders/ContactInfoBuilder.py
+ * ContactInfoBuilder
  */
 
 import { ContactInfo } from '../models/ContactInfo.js';

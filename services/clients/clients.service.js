@@ -1,5 +1,5 @@
 /**
- * ClientsService - JavaScript version of pages/ClientsPage.py
+ * ClientsService
  */
 
 import { expect } from '@playwright/test';

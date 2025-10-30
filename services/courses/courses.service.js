@@ -1,5 +1,5 @@
 /**
- * CoursesService - JavaScript version of pages/CoursesPage.py
+ * CoursesService
  */
 
 import { navigateTo } from '../../helpers/helpers.js';

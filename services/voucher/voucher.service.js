@@ -1,5 +1,5 @@
 /**
- * VoucherService - JavaScript version of pages/VoucherPage.py
+ * VoucherService
  */
 
 import { voucherLocators } from '../../locators/voucher/voucher.locators.js';

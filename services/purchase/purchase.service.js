@@ -1,5 +1,5 @@
 /**
- * PurchaseService - JavaScript version of pages/PurchasePage.py
+ * PurchaseService
  */
 
 import { getTimeout } from '../../config/timeouts.js';

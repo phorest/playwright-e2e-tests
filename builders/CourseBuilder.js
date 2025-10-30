@@ -1,5 +1,5 @@
 /**
- * CourseBuilder - JavaScript version of builders/CourseBuilder.py
+ * CourseBuilder
  */
 
 import { Course } from '../models/Course.js';

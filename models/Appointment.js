@@ -1,5 +1,5 @@
 /**
- * Appointment model - JavaScript version of models/Appointment.py
+ * Appointment model
  */
 
 export class Appointment {

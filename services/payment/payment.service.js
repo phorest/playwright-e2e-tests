@@ -1,5 +1,5 @@
 /**
- * PaymentService - JavaScript version of pages/PaymentPage.py
+ * PaymentService
  */
 
 import { expect } from '@playwright/test';

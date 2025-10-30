@@ -1,7 +1,7 @@
 {
   "name": "phorest-js",
   "version": "1.0.0",
-  "description": "Phorest automation testing framework - JavaScript version",
+  "description": "Phorest automation testing framework",
   "main": "index.js",
   "type": "module",
   "scripts": {

@@ -1,6 +1,5 @@
 /**
  * API utilities for authentication and user management
- * JavaScript version of api/folder/auth_and_user_utils.py
  */
 
 import axios from 'axios';

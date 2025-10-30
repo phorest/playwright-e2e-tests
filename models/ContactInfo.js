@@ -1,5 +1,5 @@
 /**
- * ContactInfo model - JavaScript version of models/ContactInfo.py
+ * ContactInfo model
  */
 
 export class ContactInfo {

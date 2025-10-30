@@ -1,5 +1,5 @@
 /**
- * Environment configuration - JavaScript version of config/env.py
+ * Environment configuration
  */
 
 /**

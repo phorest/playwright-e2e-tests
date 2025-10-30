@@ -1,5 +1,5 @@
 /**
- * test_memberships.spec.js - JavaScript version of tests/test_memberships.py
+ * test_memberships.spec.js
  */
 
 import { test, expect } from '@playwright/test';

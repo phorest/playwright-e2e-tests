@@ -1,7 +1,5 @@
 /*
 /!**
- * Integration test for appointment functionality - JavaScript version
- * Direct conversion from test_appointment.py
  *!/
 
 import { test, expect } from '@playwright/test';

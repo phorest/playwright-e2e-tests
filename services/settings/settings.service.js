@@ -1,5 +1,5 @@
 /**
- * SettingsService - JavaScript version of pages/SettingsPage.py
+ * SettingsService
  */
 
 import { expect } from '@playwright/test';

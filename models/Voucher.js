@@ -1,5 +1,5 @@
 /**
- * Voucher model - JavaScript version of models/Voucher.py
+ * Voucher model
  */
 
 export class Voucher {

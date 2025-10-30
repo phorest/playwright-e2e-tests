@@ -1,5 +1,5 @@
 /**
- * Course model - JavaScript version of models/Course.py
+ * Course model
  */
 
 export class Course {

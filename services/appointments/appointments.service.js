@@ -1,5 +1,5 @@
 /**
- * AppointmentsService - JavaScript version of pages/AppointmentsPage.py
+ * AppointmentsService
  */
 
 import { expect } from '@playwright/test';

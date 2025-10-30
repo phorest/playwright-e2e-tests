@@ -1,5 +1,5 @@
 /**
- * Service model - JavaScript version of models/Service.py
+ * Service model
  */
 
 export class Service {
