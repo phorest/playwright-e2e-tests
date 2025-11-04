@@ -10,6 +10,13 @@ SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL:-}"
 JOB_NAME="${JOB_NAME:-Playwright E2E Tests}"
 CI_URL="${CI_URL:-}"
 
+//Ensure if jq is available 
++ if ! command -v jq &> /dev/null; then
++ echo "❌ jq is required but not installed."
++  exit 1
++fi
++
+
 if [[ -z "$SLACK_WEBHOOK_URL" ]]; then
   echo "❌ SLACK_WEBHOOK_URL not set."
   exit 1
@@ -29,37 +36,45 @@ fi
 
 # Optional: Count test results from JSON (if available)
 if [[ -f "$PLAYWRIGHT_RESULTS_FILE" ]]; then
-  TOTAL=$(jq '.suites | map(.specs | length) | add' "$PLAYWRIGHT_RESULTS_FILE")
-  PASSED=$(jq '[.suites[].specs[] | select(.ok == true)] | length' "$PLAYWRIGHT_RESULTS_FILE")
-  FAILED=$(jq '[.suites[].specs[] | select(.ok == false)] | length' "$PLAYWRIGHT_RESULTS_FILE")
+  TOTAL=$(jq '.suites | map(.specs | length) | add' "$PLAYWRIGHT_RESULTS_FILE" 2>/dev/null) || TOTAL="N/A"
+  PASSED=$(jq '[.suites[].specs[] | select(.ok == true)] | length' "$PLAYWRIGHT_RESULTS_FILE">/dev/null) || PASSED="N/A"
+  FAILED=$(jq '[.suites[].specs[] | select(.ok == false)] | length' "$PLAYWRIGHT_RESULTS_FILE">/dev/null) || FAILED="N/A"
 else
   TOTAL="N/A"; PASSED="N/A"; FAILED="N/A"
 fi
 
 # --- Message payload ---
-read -r -d '' PAYLOAD <<EOF
-{
-  "attachments": [
-    {
-      "color": "$COLOR",
-      "title": "$JOB_NAME: $STATUS",
-      "text": "Total: $TOTAL | Passed: $PASSED | Failed: $FAILED",
-      "footer": "Playwright E2E",
-      "footer_icon": "https://playwright.dev/img/playwright-logo.svg",
-      "actions": [
++PAYLOAD=$(jq -n \
++  --arg color "$COLOR" \
++  --arg title "$JOB_NAME: $STATUS" \
++  --arg text "Total: $TOTAL | Passed: $PASSED | Failed: $FAILED" \
++  --arg url "$CI_URL" \
++  --argjson ts "$(date +%s)" \
++  '{
++    attachments: [{
++      color: $color,
++      title: $title,
++      text: $text,
++      footer: "Playwright E2E",
++      footer_icon: "https://playwright.dev/img/playwright-logo.svg",
++      actions: [{
++        type: "button",
++        text: "View CI Run",
++        url: $url
++      }],
++      ts: $ts
++    }]
++  }')
+
+# --- Send to Slack ---
+ "actions": [
         {
           "type": "button",
           "text": "View CI Run",
           "url": "$CI_URL"
         }
       ],
-      "ts": $(date +%s)
-    }
-  ]
-}
-EOF
 
-# --- Send to Slack ---
 curl -X POST -H 'Content-type: application/json' \
      --data "$PAYLOAD" "$SLACK_WEBHOOK_URL"
 
