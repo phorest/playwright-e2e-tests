@@ -10,7 +10,7 @@ SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL:-}"
 JOB_NAME="${JOB_NAME:-Playwright E2E Tests}"
 CI_URL="${CI_URL:-}"
 
-//Ensure if jq is available 
++# Ensure if jq is available 
 + if ! command -v jq &> /dev/null; then
 + echo "❌ jq is required but not installed."
 +  exit 1
@@ -57,24 +57,13 @@ fi
 +      text: $text,
 +      footer: "Playwright E2E",
 +      footer_icon: "https://playwright.dev/img/playwright-logo.svg",
-+      actions: [{
-+        type: "button",
-+        text: "View CI Run",
-+        url: $url
-+      }],
++      actions: (if $url != "" then [{type: "button"}, text: "View CI Run", url: $url}] else [] end),
 +      ts: $ts
 +    }]
 +  }')
 
 # --- Send to Slack ---
- "actions": [
-        {
-          "type": "button",
-          "text": "View CI Run",
-          "url": "$CI_URL"
-        }
-      ],
-
+ 
 curl -X POST -H 'Content-type: application/json' \
      --data "$PAYLOAD" "$SLACK_WEBHOOK_URL"
 
