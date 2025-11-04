@@ -57,7 +57,7 @@ fi
 +      text: $text,
 +      footer: "Playwright E2E",
 +      footer_icon: "https://playwright.dev/img/playwright-logo.svg",
-+      actions: (if $url != "" then [{type: "button"}, text: "View CI Run", url: $url}] else [] end),
++      actions: (if $url != "" then [{type: "button", text: "View CI Run", url: $url}] else [] end),
 +      ts: $ts
 +    }]
 +  }')
