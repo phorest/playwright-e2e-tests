@@ -64,13 +64,13 @@ jobs:
       run: chmod +x ./slack_results/notify-slack.sh
     - name: Notify Slack (success) 
       if: success()
-      run: ./slack_results/notify-slack.sh success
+      run: ./slack_results/notify-slack.sh 
       env:
         SLACK_WEBHOOK_URL: ${{ env.SLACK_WEBHOOK_URL }}
         CI_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
     - name: Notify Slack (failure)
       if: failure()
-      run: ./slack_results/notify-slack.sh failure
+      run: ./slack_results/notify-slack.sh 
       env:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         CI_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
