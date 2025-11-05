@@ -1,5 +1,5 @@
 /**
- * Helper functions - JavaScript version of helpers.py
+ * Helper functions
  */
 
 import { expect } from '@playwright/test';

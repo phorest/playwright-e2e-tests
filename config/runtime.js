@@ -1,14 +1,14 @@
 /**
- * Runtime configuration - JavaScript version of config/runtime.py
+ * Runtime configuration
  */
 
 import { Env, DEV, getEnv } from './env.js';
 
-// Active environment - equivalent to Python ACTIVE_ENV
+// Active environment
 let ACTIVE_ENV = DEV;
 
 /**
- * Set runtime environment - equivalent to Python set_runtime function
+ * Set runtime environment
  * @param {Env} env - Environment to set
  */
 export function setRuntime(env) {
@@ -26,7 +26,7 @@ export function setActiveEnv(envName) {
 }
 
 /**
- * Get active environment - equivalent to Python ACTIVE_ENV
+ * Get active environment
  * @returns {Env} Active environment
  */
 export function getActiveEnv() {

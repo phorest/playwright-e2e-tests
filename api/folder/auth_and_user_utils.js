@@ -1,6 +1,5 @@
 /**
  * API utilities for authentication and user management
- * JavaScript version of api/folder/auth_and_user_utils.py
  */
 
 import axios from 'axios';
@@ -9,7 +8,7 @@ import { getActiveEnv } from '../../config/runtime.js';
 import { Staff } from '../../models/Staff.js';
 import { User } from '../../models/User.js';
 
-// Environment getters - exact copy from Python
+// Environment getters
 function BUSINESS_ID() {
     return getActiveEnv().businessId;
 }

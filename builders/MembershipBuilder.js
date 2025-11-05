@@ -1,5 +1,5 @@
 /**
- * MembershipBuilder - JavaScript version of builders/MembershipBuilder.py
+ * MembershipBuilder
  */
 
 import { Membership } from '../models/Membership.js';

@@ -117,8 +117,8 @@ export class MembershipsService {
 
         for (let attempt = 0; attempt < 5; attempt++) {
             await this.page.waitForTimeout(1000);
-            if (await checkboxLocator.count() > 0 && await checkboxLocator.first.isVisible()) {
-                await checkboxLocator.first.click();
+            if (await checkboxLocator.count() > 0 && await checkboxLocator.first().isVisible()) {
+                await checkboxLocator.first().click();
                 console.log(` Selected checkbox for membership '${membership.name}' in Billing failed`);
                 await membershipsLocators.moveToBillingDueButton(this.page).click();
                 await membershipsLocators.yesButton(this.page).click();
@@ -128,8 +128,8 @@ export class MembershipsService {
 
                 for (let retry = 0; retry < 15; retry++) {
                     await this.page.waitForTimeout(500);
-                    if (await dueCheckboxLocator.count() > 0 && await dueCheckboxLocator.first.isVisible()) {
-                        await dueCheckboxLocator.first.click();
+                    if (await dueCheckboxLocator.count() > 0 && await dueCheckboxLocator.first().isVisible()) {
+                        await dueCheckboxLocator.first().click();
                         console.log(` Selected checkbox for membership '${membership.name}' in Billing due`);
                         await membershipsLocators.manuallyBilledButton(this.page).click();
                         await membershipsLocators.yesButton(this.page).click();

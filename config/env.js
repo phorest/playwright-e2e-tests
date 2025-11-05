@@ -1,9 +1,9 @@
 /**
- * Environment configuration - JavaScript version of config/env.py
+ * Environment configuration
  */
 
 /**
- * Environment class - equivalent to Python dataclass
+ * Environment class
  */
 export class Env {
     constructor({
@@ -29,7 +29,7 @@ export class Env {
     }
 }
 
-// Development environment - exact copy from Python
+// Development environment
 export const DEV = new Env({
     name: "dev",
     baseUrl: "https://my-dev.phorest.com",
@@ -42,7 +42,7 @@ export const DEV = new Env({
     headed: true,
 });
 
-// Production environment - exact copy from Python
+// Production environment
 export const PROD = new Env({
     name: "prod",
     baseUrl: "https://my.phorest.com",
@@ -55,11 +55,11 @@ export const PROD = new Env({
     headed: true,
 });
 
-// Available environments - exact copy from Python
+// Available environments
 export const ENVS = { dev: DEV, prod: PROD };
 
 /**
- * Get environment by name - equivalent to Python get_env function
+ * Get environment by name
  * @param {string} name - Environment name
  * @returns {Env} Environment
  */

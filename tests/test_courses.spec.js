@@ -1,9 +1,8 @@
 /**
- * test_courses.spec.js - JavaScript version of tests/test_courses.py
  */
 
 import { test, expect } from '@playwright/test';
-import { setActiveEnv, getActiveEnv } from '../config/runtime.js';
+import { getActiveEnv } from '../config/runtime.js';
 import {
     getAccessTokenFromLocalStorage,
     createStaffUserRest,
@@ -22,15 +21,13 @@ import { CategoryBuilder } from '../builders/CategoryBuilder.js';
 import { ContactInfoBuilder } from '../builders/ContactInfoBuilder.js';
 import { VoucherBuilder } from '../builders/VoucherBuilder.js';
 
-import { BookingPage } from '../pages/BookingPage.js';
-import { ClientsPage } from '../pages/ClientsPage.js';
-import { AppointmentsPage } from '../pages/AppointmentsPage.js';
-import { CoursesPage } from '../pages/CoursesPage.js';
-import { PurchasePage } from '../pages/PurchasePage.js';
-import { VoucherPage } from '../pages/VoucherPage.js';
-import { LoginPage } from '../pages/LoginPage.js';
-
-setActiveEnv('dev');
+import { BookingService } from '../services/booking/booking.service.js';
+import { ClientsService } from '../services/clients/clients.service.js';
+import { AppointmentsService } from '../services/appointments/appointments.service.js';
+import { CoursesService } from '../services/courses/courses.service.js';
+import { PurchaseService } from '../services/purchase/purchase.service.js';
+import { VoucherService } from '../services/voucher/voucher.service.js';
+import LoginService from '../services/login/login.service.js';
 
 let testContext = {};
 
@@ -66,9 +63,9 @@ test('test_courses', async ({ browser }) => {
     const context = await browser.newContext({ baseURL: getActiveEnv().baseUrl });
     const page1 = await context.newPage();
 
-    const loginPage = new LoginPage(page1, getActiveEnv().baseUrl);
-    await loginPage.login(getActiveEnv().staffEmail, getActiveEnv().staffPassword);
-    const bookingLink = await loginPage.goToHomepageAfterLogin();
+    const loginService = new LoginService(page1, getActiveEnv().baseUrl);
+    await loginService.login(getActiveEnv().staffEmail, getActiveEnv().staffPassword);
+    const bookingLink = await loginService.goToHomepageAfterLogin();
 
     const token = await getAccessTokenFromLocalStorage(page1);
     const staffObject = await createStaffUserRest(token);
@@ -86,39 +83,39 @@ test('test_courses', async ({ browser }) => {
 
     let bookingTab = await context.newPage();
     await bookingTab.goto(bookingLink);
-    let bookingPage = new BookingPage(bookingTab);
+    let bookingService = new BookingService(bookingTab);
 
-    await bookingPage.verifyContactInfo(contact);
-    await bookingPage.createAccountFromMyAccount(user);
-    await bookingPage.verifyRegistrationSuccess();
+    await bookingService.verifyContactInfo(contact);
+    await bookingService.createAccountFromMyAccount(user);
+    await bookingService.verifyRegistrationSuccess();
     await bookingTab.close();
 
     await page1.bringToFront();
 
-    const voucherPage = new VoucherPage(page1);
-    await voucherPage.createVoucherForUser(voucher);
+    const voucherService = new VoucherService(page1);
+    await voucherService.createVoucherForUser(voucher);
 
-    const coursesPage = new CoursesPage(page1);
-    await coursesPage.createCourse(course);
+    const coursesService = new CoursesService(page1);
+    await coursesService.createCourse(course);
 
-    const purchasePage = new PurchasePage(page1);
-    await purchasePage.purchaseCourse(course, user, staffObject);
+    const purchaseService = new PurchaseService(page1);
+    await purchaseService.purchaseCourse(course, user, staffObject);
 
     bookingTab = await context.newPage();
     await bookingTab.goto(bookingLink);
-    bookingPage = new BookingPage(bookingTab);
+    bookingService = new BookingService(bookingTab);
 
-    await bookingPage.purchaseCourseFromList(course);
-    await bookingPage.payWithVoucher(voucher, card);
-    await bookingPage.bookAServiceFromCourses(staffObject, course, service);
-    await bookingPage.verifyCourseUsedVisible(course);
+    await bookingService.purchaseCourseFromList(course);
+    await bookingService.payWithVoucher(voucher, card);
+    await bookingService.bookAServiceFromCourses(staffObject, course, service);
+    await bookingService.verifyCourseUsedVisible(course);
 
     await page1.bringToFront();
-    const apptPage = new AppointmentsPage(page1);
-    await apptPage.goto();
-    await apptPage.deleteBookingByPhone(user.phone);
+    const apptService = new AppointmentsService(page1);
+    await apptService.goto();
+    await apptService.deleteBookingByPhone(user.phone);
 
-    const clientsPage = new ClientsPage(page1);
-    await clientsPage.searchForClients(user);
-    await clientsPage.forgetClient(user);
+    const clientsService = new ClientsService(page1);
+    await clientsService.searchForClients(user);
+    await clientsService.forgetClient(user);
 });

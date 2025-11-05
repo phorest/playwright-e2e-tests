@@ -17,6 +17,8 @@ dotenv.config();
  */
 export default defineConfig({
   testDir: './tests',
+  /* Global setup - runs once before all tests */
+  globalSetup: './tests/global-setup.js',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
