@@ -62,10 +62,10 @@ jobs:
       run: chmod +x ./slack_results/notify-slack.sh
     - name: Notify Slack (success) 
       if: success()
-      run: ./slack_results/notify-slack.sh
+      run: ./slack_results/notify-slack.sh success
     - name: Notify Slack (failure)
       if: failure()
-      run: ./slack_results/notify-slack.sh
+      run: ./slack_results/notify-slack.sh failure
     - uses: actions/upload-artifact@v4
       if: always()
       with:
