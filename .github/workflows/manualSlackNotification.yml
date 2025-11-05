@@ -51,11 +51,13 @@ jobs:
       run: npm ci
     - name: Install Playwright Browsers
       run: npx playwright install chromium --with-deps
+      # --- Run Playwright tests with JSON output for Slack ---
     - name: Run Playwright tests
       #Generate JSON report for Slack + default HTML report
       run: | 
-        npx playwright test --reporter=list,json,html --output=playwright-report/test-results.json
-        continue-on-error: true  # Ensure Slack gets notified even if tests fail
+          mkdir -p playwright-report/json
+          npx playwright test --reporter=list,json,html --output=playwright-report/test-results.json
+      continue-on-error: true
       
     - name: Debug - list files
       run: ls -R
