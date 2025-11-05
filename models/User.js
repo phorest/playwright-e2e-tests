@@ -1,5 +1,5 @@
 /**
- * User model
+ * User model - JavaScript version of models/User.py
  */
 
 export class User {

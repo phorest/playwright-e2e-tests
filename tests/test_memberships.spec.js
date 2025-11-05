@@ -1,5 +1,5 @@
 /**
- * test_memberships.spec.js
+ * test_memberships.spec.js - JavaScript version of tests/test_memberships.py
  */
 
 import { test, expect } from '@playwright/test';
@@ -23,13 +23,13 @@ import { CategoryBuilder } from '../builders/CategoryBuilder.js';
 import { ContactInfoBuilder } from '../builders/ContactInfoBuilder.js';
 import { VoucherBuilder } from '../builders/VoucherBuilder.js';
 
-import { BookingService } from '../services/booking/booking.service.js';
-import { ClientsService } from '../services/clients/clients.service.js';
-import { AppointmentsService } from '../services/appointments/appointments.service.js';
-import { MembershipsService } from '../services/memberships/memberships.service.js';
-import { PurchaseService } from '../services/purchase/purchase.service.js';
-import { VoucherService } from '../services/voucher/voucher.service.js';
-import LoginService from '../services/login/login.service.js';
+import { BookingPage } from '../pages/BookingPage.js';
+import { ClientsPage } from '../pages/ClientsPage.js';
+import { AppointmentsPage } from '../pages/AppointmentsPage.js';
+import { MembershipsPage } from '../pages/MembershipsPage.js';
+import { PurchasePage } from '../pages/PurchasePage.js';
+import { VoucherPage } from '../pages/VoucherPage.js';
+import { LoginPage } from '../pages/LoginPage.js';
 
 setActiveEnv('dev');
 
@@ -53,9 +53,9 @@ test('test_memberships', async ({ browser }) => {
     const context = await browser.newContext({ baseURL: getActiveEnv().baseUrl });
     const page1 = await context.newPage();
 
-    const loginService = new LoginService(page1, getActiveEnv().baseUrl);
-    await loginService.login(getActiveEnv().staffEmail, getActiveEnv().staffPassword);
-    const bookingLink = await loginService.goToHomepageAfterLogin();
+    const loginPage = new LoginPage(page1, getActiveEnv().baseUrl);
+    await loginPage.login(getActiveEnv().staffEmail, getActiveEnv().staffPassword);
+    const bookingLink = await loginPage.goToHomepageAfterLogin();
 
     const token = await getAccessTokenFromLocalStorage(page1);
     const staffObject = await createStaffUserRest(token);
@@ -72,60 +72,60 @@ test('test_memberships', async ({ browser }) => {
 
     const bookingTab = await context.newPage();
     await bookingTab.goto(bookingLink);
-    const bookingService = new BookingService(bookingTab);
+    const bookingPage = new BookingPage(bookingTab);
 
-    await bookingService.verifyContactInfo(contact);
-    await bookingService.createAccountFromMyAccount(user);
-    await bookingService.verifyRegistrationSuccess();
+    await bookingPage.verifyContactInfo(contact);
+    await bookingPage.createAccountFromMyAccount(user);
+    await bookingPage.verifyRegistrationSuccess();
     await bookingTab.close();
 
     await page1.bringToFront();
 
-    const voucherService = new VoucherService(page1);
-    await voucherService.createVoucherForUser(voucher);
+    const voucherPage = new VoucherPage(page1);
+    await voucherPage.createVoucherForUser(voucher);
 
-    const membershipsService = new MembershipsService(page1);
-    await membershipsService.createCreditMembership(membership);
+    const membershipsPage = new MembershipsPage(page1);
+    await membershipsPage.createCreditMembership(membership);
 
-    const purchaseService = new PurchaseService(page1);
-    await purchaseService.purchaseMembership(membership, user, staffObject);
-    await purchaseService.completeCashPayment();
+    const purchasePage = new PurchasePage(page1);
+    await purchasePage.purchaseMembership(membership, user, staffObject);
+    await purchasePage.completeCashPayment();
 
     const bookingTab2 = await context.newPage();
     await bookingTab2.goto(bookingLink);
-    const bookingService2 = new BookingService(bookingTab2);
+    const bookingPage2 = new BookingPage(bookingTab2);
 
-    await bookingService2.verifyMembershipSummary(membership);
-    await bookingService2.verifyMembershipFromLoyalty(membership);
-    await bookingService2.selectServiceAndBook(category);
-    await bookingService2.selectStaffAndTime(staffObject);
-    await bookingService2.fillCard(card, voucher);
+    await bookingPage2.verifyMembershipSummary(membership);
+    await bookingPage2.verifyMembershipFromLoyalty(membership);
+    await bookingPage2.selectServiceAndBook(category);
+    await bookingPage2.selectStaffAndTime(staffObject);
+    await bookingPage2.fillCard(card, voucher);
 
     await page1.bringToFront();
-    await membershipsService.billMembershipPayment(membership, user);
+    await membershipsPage.billMembershipPayment(membership, user);
 
-    const apptService = new AppointmentsService(page1);
-    await apptService.goto();
-    await apptService.makeCashPaymentByPhone(user.phone);
+    const appt = new AppointmentsPage(page1);
+    await appt.goto();
+    await appt.makeCashPaymentByPhone(user.phone);
 
     await bookingTab2.bringToFront();
     await freezeClientMembershipByUser(user, token);
-    await bookingService2.verifyMembershipFrozenVisible(membership);
+    await bookingPage2.verifyMembershipFrozenVisible(membership);
 
     await page1.bringToFront();
-    await membershipsService.archiveMembership(membership);
+    await membershipsPage.archiveMembership(membership);
 
-    await apptService.verifyAndUndoPaymentByClientName(user.name);
-    await apptService.deleteBookingByPhone(user.phone);
+    await appt.verifyAndUndoPaymentByClientName(user.name);
+    await appt.deleteBookingByPhone(user.phone);
 
     await unfreezeClientMembershipByUser(user, token);
 
     await bookingTab2.bringToFront();
-    await bookingService2.cancelMembershipAndVerify(membership);
+    await bookingPage2.cancelMembershipAndVerify(membership);
     await cancelClientMembershipByUser(user, token);
 
     await page1.bringToFront();
-    const clientsService = new ClientsService(page1);
-    await clientsService.searchForClients(user);
-    await clientsService.forgetClient(user);
+    const clients = new ClientsPage(page1);
+    await clients.searchForClients(user);
+    await clients.forgetClient(user);
 });

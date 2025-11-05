@@ -1,5 +1,5 @@
 /**
- * Runtime configuration
+ * Runtime configuration - JavaScript version of config/runtime.py
  */
 
 import { Env, DEV, getEnv } from './env.js';

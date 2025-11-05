@@ -1,5 +1,5 @@
 /**
- * CategoryBuilder
+ * CategoryBuilder - JavaScript version of builders/CategoryBuilder.py
  */
 
 import { Category } from '../models/Category.js';

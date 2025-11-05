@@ -1,5 +1,5 @@
 /**
- * CardBuilder
+ * CardBuilder - JavaScript version of builders/CardBuilder.py
  */
 
 import { Card } from '../models/Card.js';

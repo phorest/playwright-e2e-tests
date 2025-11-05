@@ -1,5 +1,5 @@
 /**
- * AppointmentBuilder
+ * AppointmentBuilder - JavaScript version of builders/AppointmentBuilder.py
  */
 
 import { Appointment } from '../models/Appointment.js';

@@ -1,5 +1,5 @@
 /**
- * VoucherBuilder
+ * VoucherBuilder - JavaScript version of builders/VoucherBuilder.py
  */
 
 import { Voucher } from '../models/Voucher.js';

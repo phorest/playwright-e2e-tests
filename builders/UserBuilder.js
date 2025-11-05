@@ -1,5 +1,5 @@
 /**
- * UserBuilder
+ * UserBuilder - JavaScript version of builders/UserBuilder.py
  */
 
 import { User } from '../models/User.js';

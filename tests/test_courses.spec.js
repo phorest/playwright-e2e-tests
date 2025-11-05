@@ -1,3 +1,6 @@
+/**
+ * test_courses.spec.js - JavaScript version of tests/test_courses.py
+ */
 
 import { test, expect } from '@playwright/test';
 import { setActiveEnv, getActiveEnv } from '../config/runtime.js';
@@ -19,13 +22,13 @@ import { CategoryBuilder } from '../builders/CategoryBuilder.js';
 import { ContactInfoBuilder } from '../builders/ContactInfoBuilder.js';
 import { VoucherBuilder } from '../builders/VoucherBuilder.js';
 
-import { BookingService } from '../services/booking/booking.service.js';
-import { ClientsService } from '../services/clients/clients.service.js';
-import { AppointmentsService } from '../services/appointments/appointments.service.js';
-import { CoursesService } from '../services/courses/courses.service.js';
-import { PurchaseService } from '../services/purchase/purchase.service.js';
-import { VoucherService } from '../services/voucher/voucher.service.js';
-import LoginService from '../services/login/login.service.js';
+import { BookingPage } from '../pages/BookingPage.js';
+import { ClientsPage } from '../pages/ClientsPage.js';
+import { AppointmentsPage } from '../pages/AppointmentsPage.js';
+import { CoursesPage } from '../pages/CoursesPage.js';
+import { PurchasePage } from '../pages/PurchasePage.js';
+import { VoucherPage } from '../pages/VoucherPage.js';
+import { LoginPage } from '../pages/LoginPage.js';
 
 setActiveEnv('dev');
 
@@ -63,7 +66,7 @@ test('test_courses', async ({ browser }) => {
     const context = await browser.newContext({ baseURL: getActiveEnv().baseUrl });
     const page1 = await context.newPage();
 
-    const loginPage = new LoginService(page1, getActiveEnv().baseUrl);
+    const loginPage = new LoginPage(page1, getActiveEnv().baseUrl);
     await loginPage.login(getActiveEnv().staffEmail, getActiveEnv().staffPassword);
     const bookingLink = await loginPage.goToHomepageAfterLogin();
 
@@ -83,39 +86,39 @@ test('test_courses', async ({ browser }) => {
 
     let bookingTab = await context.newPage();
     await bookingTab.goto(bookingLink);
-    let bookingService = new BookingService(bookingTab);
+    let bookingPage = new BookingPage(bookingTab);
 
-    await bookingService.verifyContactInfo(contact);
-    await bookingService.createAccountFromMyAccount(user);
-    await bookingService.verifyRegistrationSuccess();
+    await bookingPage.verifyContactInfo(contact);
+    await bookingPage.createAccountFromMyAccount(user);
+    await bookingPage.verifyRegistrationSuccess();
     await bookingTab.close();
 
     await page1.bringToFront();
 
-    const voucherService = new VoucherService(page1);
-    await voucherService.createVoucherForUser(voucher);
+    const voucherPage = new VoucherPage(page1);
+    await voucherPage.createVoucherForUser(voucher);
 
-    const coursesService = new CoursesService(page1);
-    await coursesService.createCourse(course);
+    const coursesPage = new CoursesPage(page1);
+    await coursesPage.createCourse(course);
 
-    const purchaseService = new PurchaseService(page1);
-    await purchaseService.purchaseCourse(course, user, staffObject);
+    const purchasePage = new PurchasePage(page1);
+    await purchasePage.purchaseCourse(course, user, staffObject);
 
     bookingTab = await context.newPage();
     await bookingTab.goto(bookingLink);
-    bookingService = new BookingService(bookingTab);
+    bookingPage = new BookingPage(bookingTab);
 
-    await bookingService.purchaseCourseFromList(course);
-    await bookingService.payWithVoucher(voucher, card);
-    await bookingService.bookAServiceFromCourses(staffObject, course, service);
-    await bookingService.verifyCourseUsedVisible(course);
+    await bookingPage.purchaseCourseFromList(course);
+    await bookingPage.payWithVoucher(voucher, card);
+    await bookingPage.bookAServiceFromCourses(staffObject, course, service);
+    await bookingPage.verifyCourseUsedVisible(course);
 
     await page1.bringToFront();
-    const apptService = new AppointmentsService(page1);
-    await apptService.goto();
-    await apptService.deleteBookingByPhone(user.phone);
+    const apptPage = new AppointmentsPage(page1);
+    await apptPage.goto();
+    await apptPage.deleteBookingByPhone(user.phone);
 
-    const clientsService = new ClientsService(page1);
-    await clientsService.searchForClients(user);
-    await clientsService.forgetClient(user);
+    const clientsPage = new ClientsPage(page1);
+    await clientsPage.searchForClients(user);
+    await clientsPage.forgetClient(user);
 });

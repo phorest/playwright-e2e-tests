@@ -1,5 +1,5 @@
 /**
- * Membership model
+ * Membership model - JavaScript version of models/Membership.py
  */
 
 export class Membership {

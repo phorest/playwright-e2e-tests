@@ -1,5 +1,5 @@
 /**
- * Staff model
+ * Staff model - JavaScript version of models/Staff.py
  */
 
 export class Staff {

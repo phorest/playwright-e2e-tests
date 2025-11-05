@@ -1,5 +1,5 @@
 /**
- * Category model
+ * Category model - JavaScript version of models/Category.py
  */
 
 import { Service } from './Service.js';

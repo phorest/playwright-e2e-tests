@@ -1,5 +1,5 @@
 /**
- * Card model
+ * Card model - JavaScript version of models/Card.py
  */
 
 export class Card {
