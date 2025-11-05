@@ -65,9 +65,15 @@ jobs:
     - name: Notify Slack (success) 
       if: success()
       run: ./slack_results/notify-slack.sh success
+      env:
+         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+         CI_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
     - name: Notify Slack (failure)
       if: failure()
       run: ./slack_results/notify-slack.sh failure
+      env:
+         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+         CI_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
     - uses: actions/upload-artifact@v4
       if: always()
       with:
