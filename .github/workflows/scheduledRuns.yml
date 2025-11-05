@@ -3,13 +3,15 @@ name: Scheduled runs
 # Trigger: Run once daily at 10:00 UTC
 on:
   schedule:
-    - cron: "0 10 * * *"
+    - cron: "0 10,16 * * *"
 
 env:
   apiUsername: ${{ secrets.apiUsername }}
   apiPassword: ${{ secrets.apiPassword }}
   staffPassword: ${{ secrets.staffPassword }}
   MAILOSAURAPIKEY: ${{ secrets.MAILOSAURAPIKEY }}
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL}}
+  SLACK_CHANNEL: C09QJ9XPJAX
 
 jobs:
   cleanup-appointments:
@@ -39,8 +41,29 @@ jobs:
       run: npm ci
     - name: Install Playwright Browsers
       run: npx playwright install chromium --with-deps
+    - name: Install jq
+      run: sudo apt-get update && sudo apt-get install -y jq    
     - name: Run Playwright tests
       run: npx playwright test
+      continue-on-error: true
+    - name: Debug JSON
+      run: ls -R playwright-report/json
+    - name: Debug - list files
+      run: ls -R
+    - name: Make notify-slack.sh executable
+      run: chmod +x ./slack_results/notify-slack.sh
+    - name: Notify Slack (success) 
+      if: success()
+      run: ./slack_results/notify-slack.sh success
+      env:
+         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+         CI_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    - name: Notify Slack (failure)
+      if: failure()
+      run: ./slack_results/notify-slack.sh failure
+      env:
+         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+         CI_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
