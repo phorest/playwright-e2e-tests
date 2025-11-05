@@ -56,7 +56,7 @@ jobs:
     - name: Debug - list files
       run: ls -R
     - name: Make notify-slack.sh executable
-      run: chmod +x ./notify-slack.sh
+      run: chmod +x ./slack_results/notify-slack.sh
     - name: Notify Slack (success) 
       if: success()
       run: ./notify-slack.sh success
