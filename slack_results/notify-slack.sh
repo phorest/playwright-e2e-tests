@@ -10,6 +10,9 @@ SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL:-}"
 JOB_NAME="${JOB_NAME:-Playwright E2E Tests}"
 CI_URL="${CI_URL:-}"
 
+# Automatically find Playwright JSON report
+PLAYWRIGHT_RESULTS_FILE=$(find playwright-report/json -name "test-results.json" | head -n1)
+
 # Ensure if jq is available 
   if ! command -v jq &> /dev/null; then
    echo "❌ jq is required but not installed."
@@ -40,7 +43,9 @@ if [[ -f "$PLAYWRIGHT_RESULTS_FILE" ]]; then
   PASSED=$(jq '[.suites[].specs[] | select(.ok == true)] | length' "$PLAYWRIGHT_RESULTS_FILE">/dev/null) || PASSED="N/A"
   FAILED=$(jq '[.suites[].specs[] | select(.ok == false)] | length' "$PLAYWRIGHT_RESULTS_FILE">/dev/null) || FAILED="N/A"
 else
-  TOTAL="N/A"; PASSED="N/A"; FAILED="N/A"
+  TOTAL="N/A"; 
+  PASSED="N/A"; 
+  FAILED="N/A"
 fi
 
 # --- Message payload ---
