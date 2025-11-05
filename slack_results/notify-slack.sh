@@ -10,12 +10,12 @@ SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL:-}"
 JOB_NAME="${JOB_NAME:-Playwright E2E Tests}"
 CI_URL="${CI_URL:-}"
 
-+# Ensure if jq is available 
-+ if ! command -v jq &> /dev/null; then
-+ echo "❌ jq is required but not installed."
-+  exit 1
-+fi
-+
+# Ensure if jq is available 
+  if ! command -v jq &> /dev/null; then
+   echo "❌ jq is required but not installed."
+   exit 1
+ fi
+
 
 if [[ -z "$SLACK_WEBHOOK_URL" ]]; then
   echo "❌ SLACK_WEBHOOK_URL not set."
@@ -44,23 +44,23 @@ else
 fi
 
 # --- Message payload ---
-+PAYLOAD=$(jq -n \
-+  --arg color "$COLOR" \
-+  --arg title "$JOB_NAME: $STATUS" \
-+  --arg text "Total: $TOTAL | Passed: $PASSED | Failed: $FAILED" \
-+  --arg url "$CI_URL" \
-+  --argjson ts "$(date +%s)" \
-+  '{
-+    attachments: [{
-+      color: $color,
-+      title: $title,
-+      text: $text,
-+      footer: "Playwright E2E",
-+      footer_icon: "https://playwright.dev/img/playwright-logo.svg",
-+      actions: (if $url != "" then [{type: "button", text: "View CI Run", url: $url}] else [] end),
-+      ts: $ts
-+    }]
-+  }')
+PAYLOAD=$(jq -n \
+  --arg color "$COLOR" \
+  --arg title "$JOB_NAME: $STATUS" \
+  --arg text "Total: $TOTAL | Passed: $PASSED | Failed: $FAILED" \
+  --arg url "$CI_URL" \
+  --argjson ts "$(date +%s)" \
+  '{
+    attachments: [{
+      color: $color,
+      title: $title,
+      text: $text,
+      footer: "Playwright E2E",
+      footer_icon: "https://playwright.dev/img/playwright-logo.svg",
+      actions: (if $url != "" then [{type: "button", text: "View CI Run", url: $url}] else [] end),
+      ts: $ts
+    }]
+  }')
 
 # --- Send to Slack ---
  
