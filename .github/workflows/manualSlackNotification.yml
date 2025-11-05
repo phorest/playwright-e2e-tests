@@ -58,7 +58,8 @@ jobs:
           mkdir -p playwright-report/json
           npx playwright test --reporter=list,json,html --output=playwright-report/test-results.json
       continue-on-error: true
-      
+    - name: Debug JSON
+      run: ls -R playwright-report/json
     - name: Debug - list files
       run: ls -R
     - name: Make notify-slack.sh executable
