@@ -11,7 +11,7 @@ JOB_NAME="${JOB_NAME:-Playwright E2E Tests}"
 CI_URL="${CI_URL:-}"
 
 # Automatically find Playwright JSON report
-PLAYWRIGHT_RESULTS_FILE=$(find playwright-report/json -name "test-results.json" | head -n1)
+PLAYWRIGHT_RESULTS_FILE="playwright-report/json/test-results.json"
 
 # Ensure if jq is available 
   if ! command -v jq &> /dev/null; then
@@ -39,9 +39,9 @@ fi
 
 # Optional: Count test results from JSON (if available)
 if [[ -f "$PLAYWRIGHT_RESULTS_FILE" ]]; then
-  TOTAL=$(jq '.suites | map(.specs | length) | add' "$PLAYWRIGHT_RESULTS_FILE" 2>/dev/null) || TOTAL="N/A"
-  PASSED=$(jq '[.suites[].specs[] | select(.ok == true)] | length' "$PLAYWRIGHT_RESULTS_FILE">/dev/null) || PASSED="N/A"
-  FAILED=$(jq '[.suites[].specs[] | select(.ok == false)] | length' "$PLAYWRIGHT_RESULTS_FILE">/dev/null) || FAILED="N/A"
+  TOTAL=$(jq '.suites | map(.specs | length) | add' "$PLAYWRIGHT_RESULTS_FILE")
+  PASSED=$(jq '[.suites[].specs[] | select(.ok == true)] | length' "$PLAYWRIGHT_RESULTS_FILE")
+  FAILED=$(jq '[.suites[].specs[] | select(.ok == false)] | length' "$PLAYWRIGHT_RESULTS_FILE")
 else
   TOTAL="N/A"; 
   PASSED="N/A"; 
