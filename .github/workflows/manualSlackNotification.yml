@@ -19,6 +19,7 @@ env:
   FEATURE_FLAG: ${{ github.event.inputs.feature-flag }}
   REVISION_KEY: ${{ github.event.inputs.revision-key }}
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL}}
+  SLACK_CHANNEL: C09QJ9XPJAX
   
 jobs:
   cleanup-appointments:
