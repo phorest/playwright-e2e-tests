@@ -11,7 +11,7 @@ export const testData = {
     BUSINESS_ID: "x5Hz3_8G-PeOF3GeGcT-oQ",
     BRANCH_ID: "h6x5cwGfZwHmyoHPpS9Qkw",
     TERMINAL_ID: "tmr_F1ZwQgcHzZY0X5",
-    STRIPE_KEY: , //If running this locally, reach out to Colm/David to access the Stripe Secret Key required to use this salon
+    // STRIPE_KEY: If running this locally, reach out to Colm/David to access the Stripe Secret Key required to use this salon
     staff: [
       {
         name: "Rebecca Testerson",
