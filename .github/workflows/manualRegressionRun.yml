@@ -18,6 +18,7 @@ env:
   MAILOSAURAPIKEY: ${{ secrets.MAILOSAURAPIKEY }}
   FEATURE_FLAG: ${{ github.event.inputs.feature-flag }}
   REVISION_KEY: ${{ github.event.inputs.revision-key }}
+  UK_SECRET_KEY: ${{ secrets.UK_STRIPE_KEY }}
   
 jobs:
   cleanup-appointments:
