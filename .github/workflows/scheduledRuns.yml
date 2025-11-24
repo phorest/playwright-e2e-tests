@@ -10,6 +10,7 @@ env:
   apiPassword: ${{ secrets.apiPassword }}
   staffPassword: ${{ secrets.staffPassword }}
   MAILOSAURAPIKEY: ${{ secrets.MAILOSAURAPIKEY }}
+  UK_SECRET_KEY: ${{ secrets.UK_STRIPE_KEY }}
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL}}
   SLACK_CHANNEL: C09QJ9XPJAX
 
