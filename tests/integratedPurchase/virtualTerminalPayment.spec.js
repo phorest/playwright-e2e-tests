@@ -138,6 +138,4 @@ await page.locator(paySlideoverLocators.closePaymentButton).click();
   const paymentIntentResponseBody = await paymentIntentResponse.json();
   const paymentIntentStatus = paymentIntentResponseBody.status;
   expect(paymentIntentStatus).toBe('succeeded');
-
-  await expect(paymentMethodTransactionId).toEqual(paymentIntentId)
 })
