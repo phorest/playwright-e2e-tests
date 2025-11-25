@@ -6,10 +6,10 @@ import { purchases } from "../graphQL/queries/purchases.query.js";
  */
 class PurchasesRequests {
   /**
-   * Create a new voucher
+   * Retrieve purchases for a given date
    * @param {Object} request - Playwright request object
    * @param {string} token - Authentication token
-   * @param {Object} voucherData - Voucher data
++  * @param {string} filterDate - Date to filter purchases (YYYY-MM-DD)
    * @returns {Promise<Object>} - Response object
    */
 

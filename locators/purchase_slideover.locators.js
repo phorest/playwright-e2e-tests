@@ -33,7 +33,7 @@ export const paySlideoverLocators = {
   // The below locators are used for manually adding staff amounts (mostly during refund/edit flows)
   buttonAddStaffTip: "button[name='add-staff-member-tip']",
   inputStaffName: "input[name='staff-member']",
-  inputTipAmount: "input[name='tip-input']",
+  inputTipAmount: "input[name='tip-input']", // Note: intentionally duplicates inputTip selector for semantic clarity in staff tip flows
 
   // Direct Tipping
   tipPromptToggle: "div[name='show-tip-prompt'] button[role='switch']",
