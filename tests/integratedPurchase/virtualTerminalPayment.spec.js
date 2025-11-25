@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { test, expect, request, page  } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 import { loginLocators } from "../../locators/login/login.locators.js";
 import { paySlideoverLocators } from "../../locators/purchase_slideover.locators.js";
 import { testData } from "../../testData/colmPaySalonData.js";
@@ -70,13 +70,13 @@ await page.locator(paySlideoverLocators.closePaymentButton).click();
   // Purchase data extraction to be used for validations (just commented out logging to avoid congestion in console)
   const todaysPurchases = await purchasesResponse.json();
   // console.log(todaysPurchases);
-  const mostRecentPurchase = await todaysPurchases.data.purchases.edges[0].node
+  const mostRecentPurchase = todaysPurchases.data.purchases.edges[0].node
   // console.log(mostRecentPurchase);
-  const purchaseTotal = await Number(mostRecentPurchase.totalAmount)
-  const purchaseClient = await mostRecentPurchase.clientName
-  const paymentMethodCode = await mostRecentPurchase.payments[0].code
-  const paymentMethodAmount = await Number(mostRecentPurchase.payments[0].amount)
-  const paymentMethodTransactionId = await mostRecentPurchase.payments[0].cardTransactions[0].transactionId
+  const purchaseTotal = Number(mostRecentPurchase.totalAmount)
+  const purchaseClient = mostRecentPurchase.clientName
+  const paymentMethodCode = mostRecentPurchase.payments[0].code
+  const paymentMethodAmount =  Number(mostRecentPurchase.payments[0].amount)
+  const paymentMethodTransactionId =  mostRecentPurchase.payments[0].cardTransactions[0].transactionId
   
   // Printing required validation data to console
   console.log(purchaseTotal);
@@ -133,8 +133,8 @@ await page.locator(paySlideoverLocators.closePaymentButton).click();
   }
  );
 
-  expect(paymentIntentResponse.ok()).toBeTruthy();
-  expect(paymentIntentResponse.status()).toBe(200);
+  await expect(paymentIntentResponse.ok()).toBeTruthy();
+  await expect(paymentIntentResponse.status()).toBe(200);
 
   // Verify the payment intent is at a completed state
   const paymentIntentResponseBody = await paymentIntentResponse.json();
