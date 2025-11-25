@@ -119,7 +119,7 @@ await page.locator(paySlideoverLocators.closePaymentButton).click();
   await expect(paymentText).toBe(expected);
 
   if (paymentText === expected) {
-    console.log('Sales screen entry successfully validated for this payment');;
+    console.log('Sales screen entry successfully validated for this payment');
   };
 
   // Query the payment intent via Stripe API

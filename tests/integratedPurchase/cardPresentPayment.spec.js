@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { test, expect, request, page  } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 import { loginLocators } from "../../locators/login/login.locators.js";
 import { paySlideoverLocators } from "../../locators/purchase_slideover.locators.js";
 import { testData } from "../../testData/colmPaySalonData.js";
@@ -120,7 +120,7 @@ test("Process card present sale. @integratedPurchase", async ({ page, request })
   await expect(paymentText).toBe(expected);
 
   if (paymentText === expected) {
-    console.log('Sales screen entry successfully validated for this payment');;
+    console.log('Sales screen entry successfully validated for this payment');
   };
 
   // Query the payment intent via Stripe API
