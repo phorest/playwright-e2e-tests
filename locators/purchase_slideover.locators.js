@@ -1,6 +1,7 @@
 // Purchase screen payment slideover locators
 export const paySlideoverLocators = {
-  completePaymentButton: "[name='charge-button']",
+  completePaymentButton: "button[name='charge-button']",
+  closePaymentButton: "button[name='close-payment']",
 
   // Non-integrated payment methods
   cashButton: "button[name='add-cash-button']",
