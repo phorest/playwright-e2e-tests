@@ -65,8 +65,8 @@ test("Process card present sale. @integratedPurchase", async ({ page, request })
   const purchasesResponse = await purchasesRequests.retrieveMostRecentPurchase(request, token, filterDate);
   
   // Assert data has been returned
-  await expect(purchasesResponse.ok()).toBeTruthy();
-  await expect(purchasesResponse.status()).toBe(200);
+  expect(purchasesResponse.ok()).toBeTruthy();
+  expect(purchasesResponse.status()).toBe(200);
 
   // Purchase data extraction to be used for validations (just commented out logging to avoid congestion in console)
   const todaysPurchases = await purchasesResponse.json();
@@ -117,11 +117,7 @@ test("Process card present sale. @integratedPurchase", async ({ page, request })
   console.log(paymentText);
   console.log(expected);
 
-  await expect(paymentText).toBe(expected);
-
-  if (paymentText === expected) {
-    console.log('Sales screen entry successfully validated for this payment');
-  };
+  expect(paymentText).toBe(expected);
 
   // Query the payment intent via Stripe API
   const paymentIntentResponse = await request.get(
@@ -133,8 +129,8 @@ test("Process card present sale. @integratedPurchase", async ({ page, request })
   }
  );
 
-  await expect(paymentIntentResponse.ok()).toBeTruthy();
-  await expect(paymentIntentResponse.status()).toBe(200);
+  expect(paymentIntentResponse.ok()).toBeTruthy();
+  expect(paymentIntentResponse.status()).toBe(200);
 
   // Verify the payment intent is at a completed state
   const paymentIntentResponseBody = await paymentIntentResponse.json();

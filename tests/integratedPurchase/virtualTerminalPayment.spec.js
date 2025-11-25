@@ -64,8 +64,8 @@ await page.locator(paySlideoverLocators.closePaymentButton).click();
   const purchasesResponse = await purchasesRequests.retrieveMostRecentPurchase(request, token, filterDate);
   
   // Assert data has been returned
-  await expect(purchasesResponse.ok()).toBeTruthy();
-  await expect(purchasesResponse.status()).toBe(200);
+  expect(purchasesResponse.ok()).toBeTruthy();
+  expect(purchasesResponse.status()).toBe(200);
 
   // Purchase data extraction to be used for validations (just commented out logging to avoid congestion in console)
   const todaysPurchases = await purchasesResponse.json();
@@ -116,11 +116,7 @@ await page.locator(paySlideoverLocators.closePaymentButton).click();
   console.log(paymentText);
   console.log(expected);
 
-  await expect(paymentText).toBe(expected);
-
-  if (paymentText === expected) {
-    console.log('Sales screen entry successfully validated for this payment');
-  };
+  expect(paymentText).toBe(expected);
 
   // Query the payment intent via Stripe API
   const paymentIntentId = paymentMethodTransactionId
@@ -133,8 +129,8 @@ await page.locator(paySlideoverLocators.closePaymentButton).click();
   }
  );
 
-  await expect(paymentIntentResponse.ok()).toBeTruthy();
-  await expect(paymentIntentResponse.status()).toBe(200);
+  expect(paymentIntentResponse.ok()).toBeTruthy();
+  expect(paymentIntentResponse.status()).toBe(200);
 
   // Verify the payment intent is at a completed state
   const paymentIntentResponseBody = await paymentIntentResponse.json();
