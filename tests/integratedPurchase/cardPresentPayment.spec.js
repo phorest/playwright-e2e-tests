@@ -7,7 +7,7 @@ import generalCommands from "../../support/generalCommands.js";
 import { simulateVisaCardPresentment, simulateCardPresentment } from "../../support/stripe commands/cardPresentmentCommands.js";
 import purchasesRequests from "../../support/requests/purchases.requests.js";
 
-const staffEmail = testData.PAY_SALON.staff[0].email;;
+const staffEmail = testData.PAY_SALON.staff[0].email;
 const staffPassword = process.env.staffPassword;
 const terminalId = testData.PAY_SALON.TERMINAL_ID;
 const stripeKey = testData.PAY_SALON.STRIPE_KEY;
@@ -30,8 +30,10 @@ test("Process card present sale. @integratedPurchase", async ({ page, request })
   await page.locator(loginLocators.passwordInput).click();
   await page.locator(loginLocators.passwordInput).fill(staffPassword);
   await page.locator(loginLocators.signInButton).click();
+  await page.waitForURL('**/appointments', { timeout: 15000 });
   await expect(page).toHaveURL(
-    "a/" + testData.PAY_SALON.ACCOUNT_ID + "/appointments"
+    "a/" + testData.PAY_SALON.ACCOUNT_ID + "/appointments",
+    { timeout: 15000 }
   );
   await page.getByRole('link', { name: 'Purchase' }).click();
   await page.getByPlaceholder('First name').fill('brant');

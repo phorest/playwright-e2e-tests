@@ -6,7 +6,7 @@ import { testData } from "../../testData/colmPaySalonData.js";
 import generalCommands from "../../support/generalCommands.js";
 import purchasesRequests from "../../support/requests/purchases.requests.js";
 
-const staffEmail = testData.PAY_SALON.staff[0].email;;
+const staffEmail = testData.PAY_SALON.staff[0].email;
 const staffPassword = process.env.staffPassword;
 const stripeKey = testData.PAY_SALON.STRIPE_KEY;
 
@@ -28,8 +28,10 @@ test("Process virtual terminal sale. @integratedPurchase", async ({ page, reques
   await page.locator(loginLocators.passwordInput).click();
   await page.locator(loginLocators.passwordInput).fill(staffPassword);
   await page.locator(loginLocators.signInButton).click();
+  await page.waitForURL('**/appointments', { timeout: 15000 });
   await expect(page).toHaveURL(
-    "a/" + testData.PAY_SALON.ACCOUNT_ID + "/appointments"
+    "a/" + testData.PAY_SALON.ACCOUNT_ID + "/appointments",
+    { timeout: 15000 }
   );
   await page.getByRole('link', { name: 'Purchase' }).click();
   await page.getByPlaceholder('First name').fill('aoife');
