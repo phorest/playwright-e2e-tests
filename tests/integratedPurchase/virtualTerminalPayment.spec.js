@@ -56,7 +56,7 @@ test("Process virtual terminal sale. @integratedPurchase", async ({ page, reques
   if (countryValue === 'US') {
     console.log('US ZIP code required');
     const zipCodeEntry = page.locator(paySlideoverLocators.stripeIframe).contentFrame().locator(paySlideoverLocators.postalCodeInputField)
-    await zipCodeEntry.type('10009')
+    await zipCodeEntry.type('10001')
     } else {
     console.log('ZIP code not required');
   }
