@@ -33,7 +33,7 @@ export default defineConfig({
     /* Base URL to use in actions like `await page.goto('')`. */
     baseURL: 'https://my-dev.phorest.com',
     video: {
-      mode: 'on-first-retry',
+      mode: 'retain-on-failure',
       size: { width: 640, height: 480 }
     },
 
