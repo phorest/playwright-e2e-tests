@@ -1,0 +1,83 @@
+name: Manual slack notification run
+on:
+  workflow_dispatch:
+    inputs:
+      feature-flag:
+        description: Enter Feature Flag -> Comma separated
+        required: false
+        default: ''
+      revision-key:
+        description: Enter Revision Key
+        required: false
+        default:  ''
+
+env:
+  apiUsername: ${{ secrets.apiUsername }}
+  apiPassword: ${{ secrets.apiPassword }}
+  staffPassword: ${{ secrets.staffPassword }}
+  MAILOSAURAPIKEY: ${{ secrets.MAILOSAURAPIKEY }}
+  FEATURE_FLAG: ${{ github.event.inputs.feature-flag }}
+  REVISION_KEY: ${{ github.event.inputs.revision-key }}
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL}}
+  SLACK_CHANNEL: C09QJ9XPJAX
+  TESTINY_API_KEY: ${{secrets.TESTINY_API_KEY}}
+  
+jobs:
+  cleanup-appointments:
+    name: 🧹 Cleanup Appointments
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+    
+      - name: Install dependencies
+        run: npm i
+
+      - name: Cleanup appointments
+        run: node ./support/utils/cleanup_appointments.js dev_eu
+
+  test:
+    name: 🧪 E2E Tests
+    timeout-minutes: 60
+    needs: cleanup-appointments
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 18
+    - name: Add feature flags
+      run: node ./support/utils/add_feature_flags.js ${{ env.FEATURE_FLAG }}
+    - name: Install dependencies
+      run: npm ci
+    - name: Install Playwright Browsers
+      run: npx playwright install chromium --with-deps
+    - name: Install jq
+      run: sudo apt-get update && sudo apt-get install -y jq
+    - name: Run Playwright tests
+      run: npx playwright test
+      continue-on-error: true
+    - name: Debug JSON
+      run: ls -R playwright-report/json
+    - name: Debug - list files
+      run: ls -R
+    - name: Make notify-slack.sh executable
+      run: chmod +x ./slack_results/notify-slack.sh
+    - name: Notify Slack (success) 
+      if: success()
+      run: ./slack_results/notify-slack.sh success
+      env:
+         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+         CI_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    - name: Notify Slack (failure)
+      if: failure()
+      run: ./slack_results/notify-slack.sh failure
+      env:
+         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+         CI_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 5
