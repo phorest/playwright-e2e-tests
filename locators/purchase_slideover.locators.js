@@ -22,7 +22,7 @@ export const paySlideoverLocators = {
   expiryDateInput: "input[id='Field-expiryInput']",
   cvcInputField: "input[id='Field-cvcInput']",
   countryInputDropdown: "select[id='Field-countryInput']",
-  postalCodeInputField: "input[id='Field-postalCodeInput']", // Required for US (ZIP Code) + CA (Postal Code) virtual terminal payments
+  postalCodeInputField: "input[id='Field-postalCodeInput']", // Required for US (ZIP Code) + CA (Postal Code) + UK (Post Code) virtual terminal payments
 
   // Manual tipping
   tabTipPercentage: "button[name='tip-percentage-tab']",
