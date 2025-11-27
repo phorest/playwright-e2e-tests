@@ -14,9 +14,9 @@ export const testData = {
     STRIPE_KEY: process.env.UK_SECRET_KEY,
     staff: [
       {
-        name: "Rebecca Testerson",
-        email: "r.testerson@gmail.com",
-        id: "h6x5cwGfZwHmyoHPpS9Qkw",
+        name: "Jamie Regressionson",
+        email: "jamie.regressionson@test.com",
+        id: "O_3NytW6aUzwU4LVs9MWSw",
       },
     ],
   },
