@@ -75,6 +75,19 @@ jobs:
       env:
          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
          CI_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    - name: Upload results to Testiny
+      if: success() || failure()
+      run: |
+        chmod +x ./testiny-importer-linux
+        ./testiny-importer-linux testrun \
+          --folder-separator "" \
+          --enable-nested-folders \
+          --apikey ${{ env.TESTINY_API_KEY }} \
+          -y \
+          -P GM \
+          --junit playwright-results/results.xml \
+          --name "Playwright_Testrun_$(date +'%Y-%m-%d_%H-%M-%S')"
+
     - uses: actions/upload-artifact@v4
       if: always()
       with:
