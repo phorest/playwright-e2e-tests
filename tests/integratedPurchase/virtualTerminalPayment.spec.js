@@ -8,7 +8,7 @@ import purchasesRequests from "../../support/requests/purchases.requests.js";
 
 const staffEmail = testData.PAY_SALON.staff[0].email;
 const staffPassword = process.env.staffPassword;
-const stripeKey = testData.PAY_SALON.STRIPE_KEY;
+const stripeKey = process.env.UK_STRIPE_KEY;
 
 // Helper function
 const getCurrentDate = () => {
@@ -51,11 +51,13 @@ test("Process virtual terminal sale. @integratedPurchase", async ({ page, reques
   await expiryDateEntry.type('09/29');
   const cvcEntry = page.locator(paySlideoverLocators.stripeIframe).contentFrame().locator(paySlideoverLocators.cvcInputField);
   await cvcEntry.type('600');
+  const countryDropdown = page.locator(paySlideoverLocators.stripeIframe).contentFrame().locator(paySlideoverLocators.countryInputDropdown)
+  await countryDropdown.selectOption('Ireland')
 
 
   await page.locator(paySlideoverLocators.completePaymentButton).click();
   await expect(page.getByText('Sale complete!')).toBeVisible();
-await page.locator(paySlideoverLocators.closePaymentButton).click();
+  await page.locator(paySlideoverLocators.closePaymentButton).click();
 
   const token = await generalCommands.getAccessToken(page);
   const filterDate = String(getCurrentDate())

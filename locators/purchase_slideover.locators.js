@@ -21,6 +21,8 @@ export const paySlideoverLocators = {
   cardNumberInput: "input[id='Field-numberInput']",
   expiryDateInput: "input[id='Field-expiryInput']",
   cvcInputField: "input[id='Field-cvcInput']",
+  countryInputDropdown: "select[id='Field-countryInput']",
+  postalCodeInputField: "input[id='Field-postalCodeInput']", // Required for US (ZIP Code) + CA (Postal Code) virtual terminal payments
 
   // Manual tipping
   tabTipPercentage: "button[name='tip-percentage-tab']",
