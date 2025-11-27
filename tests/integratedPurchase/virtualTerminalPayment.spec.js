@@ -52,7 +52,14 @@ test("Process virtual terminal sale. @integratedPurchase", async ({ page, reques
   const cvcEntry = page.locator(paySlideoverLocators.stripeIframe).contentFrame().locator(paySlideoverLocators.cvcInputField);
   await cvcEntry.type('600');
   const countryDropdown = page.locator(paySlideoverLocators.stripeIframe).contentFrame().locator(paySlideoverLocators.countryInputDropdown)
-  await countryDropdown.selectOption('Ireland')
+  const countryValue = countryDropdown.inputValue
+  if (countryValue === 'US') {
+    console.log('US ZIP code required');
+    const zipCodeEntry = page.locator(paySlideoverLocators.stripeIframe).contentFrame().locator(paySlideoverLocators.postalCodeInputField)
+    await zipCodeEntry.type('10009')
+    } else {
+    console.log('ZIP code not required');
+  }
 
 
   await page.locator(paySlideoverLocators.completePaymentButton).click();
