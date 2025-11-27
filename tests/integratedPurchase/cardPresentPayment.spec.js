@@ -10,7 +10,7 @@ import purchasesRequests from "../../support/requests/purchases.requests.js";
 const staffEmail = testData.PAY_SALON.staff[0].email;
 const staffPassword = process.env.staffPassword;
 const terminalId = testData.PAY_SALON.TERMINAL_ID;
-const stripeKey = testData.PAY_SALON.STRIPE_KEY;
+const stripeKey = process.env.UK_STRIPE_KEY;
 
 // Helper function
 const getCurrentDate = () => {
