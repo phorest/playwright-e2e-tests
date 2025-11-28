@@ -51,16 +51,9 @@ test("Process virtual terminal sale. @integratedPurchase", async ({ page, reques
   await expiryDateEntry.type('09/29');
   const cvcEntry = page.locator(paySlideoverLocators.stripeIframe).contentFrame().locator(paySlideoverLocators.cvcInputField);
   await cvcEntry.type('600');
-  const countryDropdown = page.locator(paySlideoverLocators.stripeIframe).contentFrame().locator(paySlideoverLocators.countryInputDropdown)
-  const countryValue = countryDropdown.inputValue
-  if (countryValue === 'US') {
-    console.log('US ZIP code required');
-    const zipCodeEntry = page.locator(paySlideoverLocators.stripeIframe).contentFrame().locator(paySlideoverLocators.postalCodeInputField)
-    await zipCodeEntry.type('10001')
-    } else {
-    console.log('ZIP code not required');
-  }
-
+  const countryDropdown = page.locator(paySlideoverLocators.stripeIframe).contentFrame().locator(paySlideoverLocators.countryInputDropdown);
+  // This step is hard setting the payment country to avoid needing a postal code > new if clause should resolve this
+  await countryDropdown.selectOption('Ireland');
 
   await page.locator(paySlideoverLocators.completePaymentButton).click();
   await expect(page.getByText('Sale complete!')).toBeVisible();
