@@ -5,6 +5,7 @@ import { paySlideoverLocators } from "../../locators/purchase_slideover.locators
 import { testData } from "../../testData/colmPaySalonData.js";
 import generalCommands from "../../support/generalCommands.js";
 import purchasesRequests from "../../support/requests/purchases.requests.js";
+import { submitVirtualTerminalCardDetails, submitVisaCardDetails } from "../../support/stripe commands/virtualTerminalCommands.js";
 
 const staffEmail = testData.PAY_SALON.staff[0].email;
 const staffPassword = process.env.staffPassword;
@@ -45,17 +46,9 @@ test("Process virtual terminal sale. @integratedPurchase", async ({ page, reques
 
   // Enter payment details on Stripe iFrame
   await page.locator(paySlideoverLocators.virtualTerminalPayment).click();
-  const cardNumberEntry = page.locator(paySlideoverLocators.stripeIframe).contentFrame().locator(paySlideoverLocators.cardNumberInput);
-  await cardNumberEntry.type('4242424242424242');
-  const expiryDateEntry = page.locator(paySlideoverLocators.stripeIframe).contentFrame().locator(paySlideoverLocators.expiryDateInput);
-  await expiryDateEntry.type('09/29');
-  const cvcEntry = page.locator(paySlideoverLocators.stripeIframe).contentFrame().locator(paySlideoverLocators.cvcInputField);
-  await cvcEntry.type('600');
-  const countryDropdown = page.locator(paySlideoverLocators.stripeIframe).contentFrame().locator(paySlideoverLocators.countryInputDropdown);
-  // This step is hard setting the payment country to avoid needing a postal code > new if clause should resolve this
-  await countryDropdown.selectOption('Ireland');
 
-  await page.locator(paySlideoverLocators.completePaymentButton).click();
+  await submitVisaCardDetails(page, {})
+  
   await expect(page.getByText('Sale complete!')).toBeVisible();
   await page.locator(paySlideoverLocators.closePaymentButton).click();
 
