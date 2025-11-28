@@ -22,27 +22,18 @@ export async function submitVirtualTerminalCardDetails(page, {
   // Checks to ensure a post code is not required to a post code is required for the payment
   const countryValue = await countryDropdown.inputValue();
   console.log('Current country code selected is ' + countryValue)
-  if (countryValue === 'US') {
-    console.log('US ZIP Code required');
-    await zipCodeEntry.type('10009')
+    const postalCodes = {
+    'US': '10009',
+    'GB': 'EC1Y 8SY',
+    'CA': 'M5H 2N2',
+    'PR': '00631'
+    };
+    if (postalCodes[countryValue]) {
+        console.log(`${countryValue} postal code required`);
+        await zipCodeEntry.fill(postalCodes[countryValue]);
     } else {
-        if (countryValue === 'GB') {
-        console.log('UK Postcode required');
-        await zipCodeEntry.type('EC1Y 8SY')
-        } else {
-            if (countryValue === 'CA') {
-            console.log('Canadian post code required');
-            await zipCodeEntry.type('M5H 2N2')
-            } else {
-                if (countryValue === 'PR') {
-                console.log('Puerto Rican post code required');
-                await zipCodeEntry.type('00631')
-                } else {
-                console.log('Post code not required for this country');
-                }
-            }
-        }
-  }
+    console.log('Postal code not required for this country');
+    }
   
   console.log(`💳 ${paymentScenario} card details successfully entered`);
   await page.locator(paySlideoverLocators.completePaymentButton).click();
