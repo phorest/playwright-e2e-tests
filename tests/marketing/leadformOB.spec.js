@@ -15,7 +15,7 @@ test.describe('Marketing', () => {
       response.url().includes('/consultations/form') && response.status() === 200
     );
     
-    await page.goto('https://dev.phorest.com/salon/testuser-4524/book/consultations/form?lead_source=ONLINE_BOOKING', { timeout: 1000 });
+    await page.goto('https://dev.phorest.com/salon/testuser-4524/book/consultations/form?lead_source=ONLINE_BOOKING', { timeout: 5000 });
     await formLoadPromise;
     
     // Verify page loaded
