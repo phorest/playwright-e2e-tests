@@ -1,14 +1,6 @@
 const { test, expect } = require('@playwright/test');
 
-let faker;
-
-test.describe('Marketing', { tag: ['@marketing', '@regression'] }, () => {
-  
-  test.beforeAll(async () => {
-    // Dynamically import faker
-    const fakerModule = await import('@faker-js/faker');
-    faker = fakerModule.faker;
-  });
+test.describe('Marketing', () => {
 
   // Validate that user can submit lead form on OB      
   test('Validate that a lead can submit the form on OB', async ({ page }) => {
@@ -23,7 +15,7 @@ test.describe('Marketing', { tag: ['@marketing', '@regression'] }, () => {
       response.url().includes('/consultations/form') && response.status() === 200
     );
     
-    await page.goto('https://dev.phorest.com/salon/testuser-4524/book/consultations/form?lead_source=ONLINE_BOOKING', { timeout: 60000 });
+    await page.goto('https://dev.phorest.com/salon/testuser-4524/book/consultations/form?lead_source=ONLINE_BOOKING', { timeout: 1000 });
     await formLoadPromise;
     
     // Verify page loaded
