@@ -8,10 +8,26 @@ env:
   apiPassword: ${{ secrets.apiPassword }}
   staffPassword: ${{ secrets.staffPassword }}
   MAILOSAURAPIKEY: ${{ secrets.MAILOSAURAPIKEY }}
+  UK_STRIPE_KEY: ${{ secrets.UK_STRIPE_KEY }}
 
 jobs:
+  cleanup-appointments:
+    name: 🧹 Cleanup Appointments
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+    
+      - name: Install dependencies
+        run: npm i
+
+      - name: Cleanup appointments
+        run: node ./support/utils/cleanup_appointments.js dev_eu
+
   test:
+    name: 🧪 E2E Tests
     timeout-minutes: 60
+    needs: cleanup-appointments
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4

@@ -26,7 +26,12 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
+  reporter: [
+    ['list'], //console output
+    ['json', {outputFile:'playwright-report/json/test-results.json'}], //JSON for slack 
+    ['html', {outputFolder: 'playwright-report/html'}], //HTML report
+    ['junit', {outputFile: 'playwright-results/results.xml' }], //JUnit XML for Testiny
+  ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   timeout: 30000,
   use: {
@@ -77,7 +82,12 @@ export default defineConfig({
     //   name: 'Google Chrome',
     //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
     // },
+
+
+
   ],
+
+ 
 
   /* Run your local dev server before starting the tests */
   // webServer: {
