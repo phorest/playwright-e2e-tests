@@ -53,6 +53,7 @@ test.describe('Marketing', () => {
     await page.locator('[data-testid="submitButton"]').click();
     
     // Assert that lead form is submitted and user can see the return button
+    await page.waitForTimeout(2000);
     await expect(page.locator('[data-testid="goToHomePageButton"]')).toHaveText('Return to Home Page');
   });
 
