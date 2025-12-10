@@ -2,7 +2,7 @@
 import { test, expect } from "@playwright/test";
 import { loginLocators } from "../../locators/login/login.locators.js";
 import { paySlideoverLocators } from "../../locators/purchase_slideover.locators.js";
-import { testData } from "../../testData/colmPaySalonData.js";
+import { testData } from "../../testData/nonTippingUkSalon.js";
 import generalCommands from "../../support/generalCommands.js";
 import purchasesRequests from "../../support/requests/purchases.requests.js";
 import { submitVirtualTerminalCardDetails, submitVisaCardDetails } from "../../support/stripe commands/virtualTerminalCommands.js";

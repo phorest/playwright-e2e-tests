@@ -7,6 +7,7 @@ export const testData = {
     TOKEN_URL: "https://api-gateway-dev.phorest.com/auth/oauth/token",
   },
   PAY_SALON: {
+    STRIPE_KEY: process.env.UK_STRIPE_KEY,
     ACCOUNT_ID: 47403,
     BUSINESS_ID: "x5Hz3_8G-PeOF3GeGcT-oQ",
     BRANCH_ID: "h6x5cwGfZwHmyoHPpS9Qkw",

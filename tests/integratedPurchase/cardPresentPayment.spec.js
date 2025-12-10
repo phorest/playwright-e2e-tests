@@ -2,7 +2,7 @@
 import { test, expect } from "@playwright/test";
 import { loginLocators } from "../../locators/login/login.locators.js";
 import { paySlideoverLocators } from "../../locators/purchase_slideover.locators.js";
-import { testData } from "../../testData/colmPaySalonData.js";
+import { testData } from "../../testData/nonTippingUkSalon.js";
 import generalCommands from "../../support/generalCommands.js";
 import { simulateVisaCardPresentment, simulateCardPresentment } from "../../support/stripe commands/cardPresentmentCommands.js";
 import purchasesRequests from "../../support/requests/purchases.requests.js";
@@ -10,7 +10,7 @@ import purchasesRequests from "../../support/requests/purchases.requests.js";
 const staffEmail = testData.PAY_SALON.staff[0].email;
 const staffPassword = process.env.staffPassword;
 const terminalId = testData.PAY_SALON.TERMINAL_ID;
-const stripeKey = process.env.UK_STRIPE_KEY;
+const stripeKey = testData.PAY_SALON.STRIPE_KEY;
 
 // Helper function
 const getCurrentDate = () => {
