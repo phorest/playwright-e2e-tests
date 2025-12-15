@@ -12,6 +12,18 @@ export const testData = {
     BUSINESS_ID: "x5Hz3_8G-PeOF3GeGcT-oQ",
     BRANCH_ID: "h6x5cwGfZwHmyoHPpS9Qkw",
     TERMINAL_ID: "tmr_F1ZwQgcHzZY0X5",
+
+    // Stripe Account Details
+    SALON_MERCHANT_ACCOUNT_ID: 'ma-ZJAOKP2Gpf2lM1xw',
+    SALON_CONNECTED_ACCOUNT_ID: 'acct_1PxsBQQHb23tshN1',
+
+    // Payment Processing Fees
+    SALON_VAT_RATE: 23,
+    CARD_PRESENT_FLAT_FEE: 0.4, // Applies to "regular" card brand present transactions
+    CARD_PRESENT_PERCENTAGE_FEE: 1.75, // Applies to "regular" card brand present transactions
+    STORED_CARD_FLAT_FEE: 0.75, // Applies to stored card + VT
+    STORED_CARD_PERCENTAGE_FEE: 1.26, // Applies to stored card + VT
+    
     staff: [
       {
         name: "Jamie Regressionson",
