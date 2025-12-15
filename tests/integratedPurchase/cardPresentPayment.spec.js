@@ -157,7 +157,7 @@ test("Process card present sale. @integratedPurchase", async ({ page, request })
   }
  );
 
-  // Verify the payment intent is at a completed state
+  // Capture transfer data returned from Stripe
   expect(connectedAccountTransferData.ok()).toBeTruthy();
   expect(connectedAccountTransferData.status()).toBe(200);
   const connectedAccountTransferResponseBody = await connectedAccountTransferData.json();
