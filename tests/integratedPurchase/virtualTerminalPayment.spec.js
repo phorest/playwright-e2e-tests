@@ -9,7 +9,11 @@ import { submitVirtualTerminalCardDetails, submitVisaCardDetails } from "../../s
 
 const staffEmail = testData.PAY_SALON.staff[0].email;
 const staffPassword = process.env.staffPassword;
-const stripeKey = process.env.UK_STRIPE_KEY;
+const stripeKey = testData.PAY_SALON.STRIPE_KEY;
+const salonConnectedAccountId = testData.PAY_SALON.SALON_CONNECTED_ACCOUNT_ID
+const storedCardPercentageFee = testData.PAY_SALON.STORED_CARD_PERCENTAGE_FEE
+const storedCardFlatFee = testData.PAY_SALON.STORED_CARD_FLAT_FEE
+const vatRate = testData.PAY_SALON.SALON_VAT_RATE
 
 // Helper function
 const getCurrentDate = () => {
@@ -110,8 +114,8 @@ test("Process virtual terminal sale. @integratedPurchase", async ({ page, reques
   const expected = `${paymentMethodCode}(${Number(paymentMethodAmount).toFixed(2)})`;
   console.log(paymentText);
   console.log(expected);
-
   expect(paymentText).toBe(expected);
+
 
   // Query the payment intent via Stripe API
   const paymentIntentId = paymentMethodTransactionId
@@ -124,11 +128,57 @@ test("Process virtual terminal sale. @integratedPurchase", async ({ page, reques
   }
  );
 
+  // Verify the payment intent is at a completed state
   expect(paymentIntentResponse.ok()).toBeTruthy();
   expect(paymentIntentResponse.status()).toBe(200);
-
-  // Verify the payment intent is at a completed state
   const paymentIntentResponseBody = await paymentIntentResponse.json();
   const paymentIntentStatus = paymentIntentResponseBody.status;
   expect(paymentIntentStatus).toBe('succeeded');
+  const transferGroup = paymentIntentResponseBody.transfer_group;
+  const paymentTotal = Number(paymentIntentResponseBody.amount);
+
+
+  // Query the transfer data via Stripe API
+  const connectedAccountTransferData = await request.get(
+  `https://api.stripe.com/v1/transfers`,
+  {
+    params:{
+    "destination": salonConnectedAccountId,
+    "transfer_group": transferGroup
+    },
+    headers: {
+      authorization: `Bearer ${stripeKey}`,
+    }
+  }
+ );
+
+  // Capture transfer data returned from Stripe
+  expect(connectedAccountTransferData.ok()).toBeTruthy();
+  expect(connectedAccountTransferData.status()).toBe(200);
+  const connectedAccountTransferResponseBody = await connectedAccountTransferData.json();
+  const transferAmount = Number(connectedAccountTransferResponseBody.data[0].amount);
+  const grossPaymentProcessingFee = Number(connectedAccountTransferResponseBody.data[0].metadata.grossPaymentProcessingFee);
+  const netPaymentProcessingFee = Number(connectedAccountTransferResponseBody.data[0].metadata.netPaymentProcessingFee);
+
+
+  // Manually calculate fees using purchase total retrieved from purchase data query
+  const calculatedPercentageProcessingFee = Math.round(((purchaseTotal / 100) * storedCardPercentageFee) * 100) / 100;
+  const calculatedNetPaymentProcessingFee = Math.round((calculatedPercentageProcessingFee + storedCardFlatFee) * 100) / 100;
+  const calculatedGrossPaymentProcessingFee = Math.round((((calculatedNetPaymentProcessingFee / 100) * vatRate) + calculatedNetPaymentProcessingFee) * 100) / 100;
+
+  // Verify manually calculated fees equal Stripe calculated fees
+  expect(netPaymentProcessingFee).toEqual(calculatedNetPaymentProcessingFee);
+  expect(grossPaymentProcessingFee).toEqual(calculatedGrossPaymentProcessingFee);
+  console.log('The manually calculated gross payment processing fee is ' + calculatedGrossPaymentProcessingFee);
+  console.log('The Stripe calculated gross payment processing fee is ' + grossPaymentProcessingFee);
+
+  // Manually calculate transfer amount
+  const calculatedTransferAmount = Number(purchaseTotal - calculatedGrossPaymentProcessingFee)
+  const roundedTransferAmount = Number(Math.round(calculatedTransferAmount * 100) / 100).toFixed(2)
+  const adjustedCalculatedTransferAmount = Number(String(roundedTransferAmount).replace(/['.]/g, ''))
+
+  // Verify manually calculated transfer amount equal Stripe calculated transfer amount
+  expect(adjustedCalculatedTransferAmount).toEqual(transferAmount)
+  console.log('The manually calculated transfer amount is ' + adjustedCalculatedTransferAmount);
+  console.log('The Stripe calculated transfer amount is ' + transferAmount);
 })

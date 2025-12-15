@@ -143,6 +143,7 @@ test("Process card present sale. @integratedPurchase", async ({ page, request })
   const transferGroup = paymentIntentResponseBody.transfer_group;
   const paymentTotal = Number(paymentIntentResponseBody.amount);
 
+
   // Query the transfer data via Stripe API
   const connectedAccountTransferData = await request.get(
   `https://api.stripe.com/v1/transfers`,
@@ -164,6 +165,7 @@ test("Process card present sale. @integratedPurchase", async ({ page, request })
   const transferAmount = Number(connectedAccountTransferResponseBody.data[0].amount);
   const grossPaymentProcessingFee = Number(connectedAccountTransferResponseBody.data[0].metadata.grossPaymentProcessingFee);
   const netPaymentProcessingFee = Number(connectedAccountTransferResponseBody.data[0].metadata.netPaymentProcessingFee);
+
 
   // Manually calculate fees using purchase total retrieved from purchase data query
   const calculatedPercentageProcessingFee = Math.round(((purchaseTotal / 100) * cardPresentPercentageFee) * 100) / 100;
