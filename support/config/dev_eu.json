@@ -1,0 +1,18 @@
+{
+    "baseUrl": "https://my-dev.phorest.com",
+    "env": {
+      "apiUrl": "http://dev.phorest.com",
+      "graphQLUrl": "https://api-gateway-dev.phorest.com/api-facade/graphql",
+      "tokenUrl": "https://api-gateway-dev.phorest.com/auth/oauth/token",
+      "businessID": "sxoK7HHxUul4HHlK0g53tA",
+      "branchID": "wPZyP5mEARKoAIT5GEBreA",
+      "pAccount": "38853",
+      "silo": "eu",
+      "staff": [
+        {
+          "email": "june@ie.com",
+          "id": "gccIaRlziUExWD-FWye_FQ"
+        }
+      ]
+    }
+  }

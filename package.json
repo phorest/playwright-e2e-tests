@@ -8,10 +8,16 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@faker-js/faker": "^10.1.0",
     "@playwright/test": "^1.56.1",
+    "@testiny/cli": "^1.29.0",
     "@types/node": "^24.8.1"
   },
   "dependencies": {
-    "dotenv": "^17.2.3"
+    "axios": "^1.13.1",
+    "dotenv": "^17.2.3",
+    "moment": "^2.30.1",
+    "node-fetch": "^2.7.0",
+    "xml2js": "^0.6.2"
   }
 }
