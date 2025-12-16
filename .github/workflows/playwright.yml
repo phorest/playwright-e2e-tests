@@ -9,6 +9,7 @@ env:
   staffPassword: ${{ secrets.staffPassword }}
   MAILOSAURAPIKEY: ${{ secrets.MAILOSAURAPIKEY }}
   UK_STRIPE_KEY: ${{ secrets.UK_STRIPE_KEY }}
+  IE_STRIPE_KEY: ${{ secrets.IE_STRIPE_KEY }}
 
 jobs:
   cleanup-appointments:
