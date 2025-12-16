@@ -183,7 +183,7 @@ test("Process card present sale. @integratedPurchase", async ({ page, request })
   const roundedTransferAmount = Number(Math.round(calculatedTransferAmount * 100) / 100).toFixed(2)
   const adjustedCalculatedTransferAmount = Number(String(roundedTransferAmount).replace(/['.]/g, ''))
 
-  // Verify manually calculated transfer amount equal Stripe calculated transfer amount
+  // Verify manually calculated transfer amount equals Stripe calculated transfer amount
   expect(adjustedCalculatedTransferAmount).toEqual(transferAmount)
   console.log('The manually calculated transfer amount is ' + adjustedCalculatedTransferAmount);
   console.log('The Stripe calculated transfer amount is ' + transferAmount);
