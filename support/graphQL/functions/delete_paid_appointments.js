@@ -64,14 +64,16 @@ async function deletePaidAppointments (file) {
             console.log(startDate + ' to ' + endDate + ' -> ' + 'No paid appointments to delete!')
           } else {
             const purchases = result.purchaseList.purchase.length
-            console.log(startDate + ' to ' + endDate + ' -> ' + purchases + ' paid appointments to delete!')
-
+            
             for (let i = 0; i < purchases; i++) {
               const id = trimPurchaseID(result.purchaseList.purchase[i].identity[0].$.id)
-              console.log('Deleting purchase ID: ' + id)
-              await deletePurchase(deletePaidAppointmentURL, id, username, password)
-                .then((response) => {
+              if (result.purchaseList.purchase[i].voidReason === null){
+                  console.log('Deleting purchase ID: ' + id)
+                  await deletePurchase(deletePaidAppointmentURL, id, username, password)
+                    .then((response) => {
                 })
+                console.log(startDate + ' to ' + endDate + ' -> ' + purchases + ' paid appointments to delete!')
+              }
             }
           }
         }
