@@ -4,16 +4,16 @@ import { loginLocators } from "../../locators/login/login.locators.js";
 import { paySlideoverLocators } from "../../locators/purchase_slideover.locators.js";
 import { testData } from "../../testData/nonTippingUkSalon.js";
 import generalCommands from "../../support/generalCommands.js";
-import { simulateVisaCardPresentment, simulateCardPresentment } from "../../support/stripe commands/cardPresentmentCommands.js";
 import purchasesRequests from "../../support/requests/purchases.requests.js";
+import { submitVirtualTerminalCardDetails, submitVisaCardDetails } from "../../support/stripe commands/virtualTerminalCommands.js";
+import { retrievePaymentIntent } from "../../support/stripe commands/paymentIntent.js";
 
 const staffEmail = testData.PAY_SALON.staff[0].email;
 const staffPassword = process.env.staffPassword;
-const terminalId = testData.PAY_SALON.TERMINAL_ID;
 const stripeKey = testData.PAY_SALON.STRIPE_KEY;
 const salonConnectedAccountId = testData.PAY_SALON.SALON_CONNECTED_ACCOUNT_ID
-const cardPresentPercentageFee = testData.PAY_SALON.CARD_PRESENT_PERCENTAGE_FEE
-const cardPresentFlatFee = testData.PAY_SALON.CARD_PRESENT_FLAT_FEE
+const storedCardPercentageFee = testData.PAY_SALON.STORED_CARD_PERCENTAGE_FEE
+const storedCardFlatFee = testData.PAY_SALON.STORED_CARD_FLAT_FEE
 const vatRate = testData.PAY_SALON.SALON_VAT_RATE
 
 // Helper function
@@ -27,9 +27,8 @@ const getCurrentDate = () => {
     .slice(0, 10);
 };
 
-test("Process card present sale. @integratedPurchase", async ({ page, request }) => {
+test("Verify Stripe fees applied to a virtual terminal sale. @integratedPurchase @fees", async ({ page, request }) => {
   await page.goto('/');
-
   // Below steps will be updated once custom commands for login bypass, random staff, random client, random service are ported over to Playwright
   await page.locator(loginLocators.emailInput).click();
   await page.locator(loginLocators.emailInput).fill(staffEmail);
@@ -42,25 +41,20 @@ test("Process card present sale. @integratedPurchase", async ({ page, request })
     { timeout: 15000 }
   );
   await page.getByRole('link', { name: 'Purchase' }).click();
-  await page.getByPlaceholder('First name').fill('brant');
-  await page.getByRole('button', { name: 'BR Brant Rice' }).click();
+  await page.getByPlaceholder('First name').fill('aoife');
+  await page.getByRole('button', { name: 'AT Aoife Test' }).click();
   await page.getByRole('button', { name: 'JR Jamie Regressionson' }).click();
   await page.getByRole('button', { name: 'Services' }).click();
   await page.getByRole('button', { name: 'Massage' }).click();
-  await page.getByRole('button', { name: 'Deep Tissue £89.49 30min' }).click();
+  await page.getByRole('button', { name: 'Neck and Head £65.17 10min' }).click();
   await page.getByRole('button', { name: 'Pay', exact: true }).click();
   await page.locator(paySlideoverLocators.cardPresentButton).click();
-  await page.locator(paySlideoverLocators.completePaymentButton).click();
-  await expect(page.getByText('Follow the instructions on the terminal')).toBeVisible();
-  
-  // Uses Stripe simulated terminal to simulate card presentment via Stripe API
-  const paymentIntentId = await simulateVisaCardPresentment(request, {
-    terminalId: terminalId,
-    stripeKey: stripeKey,
-    retries: 5,
-    interval: 1000
-  });
 
+  // Enter payment details on Stripe iFrame
+  await page.locator(paySlideoverLocators.virtualTerminalPayment).click();
+
+  await submitVisaCardDetails(page, {})
+  
   await expect(page.getByText('Sale complete!')).toBeVisible();
   await page.locator(paySlideoverLocators.closePaymentButton).click();
 
@@ -76,72 +70,28 @@ test("Process card present sale. @integratedPurchase", async ({ page, request })
 
   // Purchase data extraction to be used for validations (just commented out logging to avoid congestion in console)
   const todaysPurchases = await purchasesResponse.json();
-  // console.log(todaysPurchases);
   const mostRecentPurchase = todaysPurchases.data.purchases.edges[0].node
-  // console.log(mostRecentPurchase);
   const purchaseTotal = Number(mostRecentPurchase.totalAmount)
-  const purchaseClient = mostRecentPurchase.clientName
-  const paymentMethodCode = mostRecentPurchase.payments[0].code
   const paymentMethodAmount =  Number(mostRecentPurchase.payments[0].amount)
   const paymentMethodTransactionId =  mostRecentPurchase.payments[0].cardTransactions[0].transactionId
   
   // Printing required validation data to console
   console.log('The purchase total is '+ purchaseTotal);
-  console.log('The purchase client is '+ purchaseClient);
-  console.log('The payment method code is '+ paymentMethodCode);
   console.log('The payment method amount is '+ paymentMethodAmount);
   console.log('The payment method transaction ID  is '+ paymentMethodTransactionId);
 
-  // Validate sales screen data - taken from 
-  await page.getByRole('link', { name: 'Manager' }).click();
-  await page.locator("#sales").click();
-  const table = page.locator('table');
-  await expect(table).toBeVisible(); // Putting await so that table validation doesn't fire prior to table actually being visible
-  const headers = table.locator('thead tr th');
-
-  const headerCount = await headers.count();
-  let paymentIndex = -1;
-
-  for (let i = 0; i < headerCount; i++) {
-    const text = (await headers.nth(i).innerText()).trim();
-    if (text === 'Payment') {
-      paymentIndex = i;
-      break;
-    }
-  };
-
-  if (paymentIndex === -1) {
-    throw new Error('Could not find "Payment" column in the table header');
-  };
-
-  const clientRow = table.locator('tbody tr', {
-    has: page.locator('td', { hasText: purchaseClient }),
+  // Uses Stripe simulated terminal to simulate card presentment via Stripe API
+  const paymentIntentId = paymentMethodTransactionId
+  const paymentIntentResponseBody = await retrievePaymentIntent(request, {
+    paymentIntentId: paymentIntentId,
+    stripeKey: stripeKey,
+    retries: 5,
+    interval: 1000
   });
 
-  const paymentText = (await clientRow.locator('td').nth(paymentIndex).innerText()).trim();
-  const expected = `${paymentMethodCode}(${Number(paymentMethodAmount).toFixed(2)})`;
-  console.log('The displayed purchase screen payment details are '+ paymentText);
-  console.log('The expected purchase screen payment details are '+ expected);
-
-  expect(paymentText).toBe(expected);
-  expect(paymentMethodTransactionId).toEqual(paymentIntentId)
-
-  // Query the payment intent via Stripe API
-  const paymentIntentResponse = await request.get(
-  `https://api.stripe.com/v1/payment_intents/${paymentIntentId}`,
-  {
-    headers: {
-      authorization: `Bearer ${stripeKey}`,
-    },
-  }
- );
-
-  // Verify the payment intent is at a completed state
-  expect(paymentIntentResponse.ok()).toBeTruthy();
-  expect(paymentIntentResponse.status()).toBe(200);
-  const paymentIntentResponseBody = await paymentIntentResponse.json();
-  const paymentIntentStatus = paymentIntentResponseBody.status;
-  expect(paymentIntentStatus).toBe('succeeded');
+  // Verify the payment intent details
+  expect(paymentIntentResponseBody.status).toBe('succeeded');
+  expect(paymentIntentResponseBody.metadata.payment_channel).toBe('VIRTUAL_TERMINAL');
   const transferGroup = paymentIntentResponseBody.transfer_group;
   const paymentTotal = Number(paymentIntentResponseBody.amount);
 
@@ -170,8 +120,8 @@ test("Process card present sale. @integratedPurchase", async ({ page, request })
 
 
   // Manually calculate fees using purchase total retrieved from purchase data query
-  const calculatedPercentageProcessingFee = Math.round(((purchaseTotal / 100) * cardPresentPercentageFee) * 100) / 100;
-  const calculatedNetPaymentProcessingFee = Math.round((calculatedPercentageProcessingFee + cardPresentFlatFee) * 100) / 100;
+  const calculatedPercentageProcessingFee = Math.round(((purchaseTotal / 100) * storedCardPercentageFee) * 100) / 100;
+  const calculatedNetPaymentProcessingFee = Math.round((calculatedPercentageProcessingFee + storedCardFlatFee) * 100) / 100;
   const calculatedGrossPaymentProcessingFee = Math.round((((calculatedNetPaymentProcessingFee / 100) * vatRate) + calculatedNetPaymentProcessingFee) * 100) / 100;
 
   // Verify manually calculated fees equal Stripe calculated fees

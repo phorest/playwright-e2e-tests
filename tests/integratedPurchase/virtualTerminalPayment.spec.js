@@ -28,6 +28,7 @@ const getCurrentDate = () => {
 
 test("Process virtual terminal sale. @integratedPurchase", async ({ page, request }) => {
   await page.goto('/');
+  // Below steps will be updated once custom commands for login bypass, random staff, random client, random service are ported over to Playwright
   await page.locator(loginLocators.emailInput).click();
   await page.locator(loginLocators.emailInput).fill(staffEmail);
   await page.locator(loginLocators.passwordInput).click();
@@ -78,11 +79,11 @@ test("Process virtual terminal sale. @integratedPurchase", async ({ page, reques
   const paymentMethodTransactionId =  mostRecentPurchase.payments[0].cardTransactions[0].transactionId
   
   // Printing required validation data to console
-  console.log(purchaseTotal);
-  console.log(purchaseClient);
-  console.log(paymentMethodCode);
-  console.log(paymentMethodAmount);
-  console.log(paymentMethodTransactionId);
+  console.log('The purchase total is '+ purchaseTotal);
+  console.log('The purchase client is '+ purchaseClient);
+  console.log('The payment method code is '+ paymentMethodCode);
+  console.log('The payment method amount is '+ paymentMethodAmount);
+  console.log('The payment method transaction ID  is '+ paymentMethodTransactionId);
 
   // Validate sales screen data - taken from 
   await page.getByRole('link', { name: 'Manager' }).click();
@@ -112,8 +113,8 @@ test("Process virtual terminal sale. @integratedPurchase", async ({ page, reques
 
   const paymentText = (await clientRow.locator('td').nth(paymentIndex).innerText()).trim();
   const expected = `${paymentMethodCode}(${Number(paymentMethodAmount).toFixed(2)})`;
-  console.log(paymentText);
-  console.log(expected);
+  console.log('The displayed purchase screen payment details are '+ paymentText);
+  console.log('The expected purchase screen payment details are '+ expected);
   expect(paymentText).toBe(expected);
 
 

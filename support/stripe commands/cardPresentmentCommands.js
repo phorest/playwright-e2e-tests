@@ -55,3 +55,11 @@ export async function simulateVisaCardPresentment(request, options = {}) {
     cardType: 'VISA'
   });
 }
+
+export async function simulateAmexCardPresentment(request, options = {}) {
+  return simulateCardPresentment(request, {
+    ...options,
+    cardNumber: '378282246310005',
+    cardType: 'AMEX'
+  });
+}

@@ -5,6 +5,7 @@ import { paySlideoverLocators } from "../../locators/purchase_slideover.locators
 import { testData } from "../../testData/nonTippingUkSalon.js";
 import generalCommands from "../../support/generalCommands.js";
 import { simulateVisaCardPresentment, simulateCardPresentment } from "../../support/stripe commands/cardPresentmentCommands.js";
+import { retrievePaymentIntent } from "../../support/stripe commands/paymentIntent.js";
 import purchasesRequests from "../../support/requests/purchases.requests.js";
 
 const staffEmail = testData.PAY_SALON.staff[0].email;
@@ -27,7 +28,7 @@ const getCurrentDate = () => {
     .slice(0, 10);
 };
 
-test("Process card present sale. @integratedPurchase", async ({ page, request }) => {
+test("Verify Stripe fees applied to a card present transaction. @integratedPurchase @fees", async ({ page, request }) => {
   await page.goto('/');
 
   // Below steps will be updated once custom commands for login bypass, random staff, random client, random service are ported over to Playwright
@@ -80,68 +81,26 @@ test("Process card present sale. @integratedPurchase", async ({ page, request })
   const mostRecentPurchase = todaysPurchases.data.purchases.edges[0].node
   // console.log(mostRecentPurchase);
   const purchaseTotal = Number(mostRecentPurchase.totalAmount)
-  const purchaseClient = mostRecentPurchase.clientName
-  const paymentMethodCode = mostRecentPurchase.payments[0].code
   const paymentMethodAmount =  Number(mostRecentPurchase.payments[0].amount)
   const paymentMethodTransactionId =  mostRecentPurchase.payments[0].cardTransactions[0].transactionId
   
   // Printing required validation data to console
   console.log('The purchase total is '+ purchaseTotal);
-  console.log('The purchase client is '+ purchaseClient);
-  console.log('The payment method code is '+ paymentMethodCode);
   console.log('The payment method amount is '+ paymentMethodAmount);
   console.log('The payment method transaction ID  is '+ paymentMethodTransactionId);
 
-  // Validate sales screen data - taken from 
-  await page.getByRole('link', { name: 'Manager' }).click();
-  await page.locator("#sales").click();
-  const table = page.locator('table');
-  await expect(table).toBeVisible(); // Putting await so that table validation doesn't fire prior to table actually being visible
-  const headers = table.locator('thead tr th');
-
-  const headerCount = await headers.count();
-  let paymentIndex = -1;
-
-  for (let i = 0; i < headerCount; i++) {
-    const text = (await headers.nth(i).innerText()).trim();
-    if (text === 'Payment') {
-      paymentIndex = i;
-      break;
-    }
-  };
-
-  if (paymentIndex === -1) {
-    throw new Error('Could not find "Payment" column in the table header');
-  };
-
-  const clientRow = table.locator('tbody tr', {
-    has: page.locator('td', { hasText: purchaseClient }),
+  // Uses Stripe simulated terminal to simulate card presentment via Stripe API
+  const paymentIntentResponseBody = await retrievePaymentIntent(request, {
+    paymentIntentId: paymentIntentId,
+    stripeKey: stripeKey,
+    retries: 5,
+    interval: 1000
   });
 
-  const paymentText = (await clientRow.locator('td').nth(paymentIndex).innerText()).trim();
-  const expected = `${paymentMethodCode}(${Number(paymentMethodAmount).toFixed(2)})`;
-  console.log('The displayed purchase screen payment details are '+ paymentText);
-  console.log('The expected purchase screen payment details are '+ expected);
-
-  expect(paymentText).toBe(expected);
-  expect(paymentMethodTransactionId).toEqual(paymentIntentId)
-
-  // Query the payment intent via Stripe API
-  const paymentIntentResponse = await request.get(
-  `https://api.stripe.com/v1/payment_intents/${paymentIntentId}`,
-  {
-    headers: {
-      authorization: `Bearer ${stripeKey}`,
-    },
-  }
- );
-
-  // Verify the payment intent is at a completed state
-  expect(paymentIntentResponse.ok()).toBeTruthy();
-  expect(paymentIntentResponse.status()).toBe(200);
-  const paymentIntentResponseBody = await paymentIntentResponse.json();
-  const paymentIntentStatus = paymentIntentResponseBody.status;
-  expect(paymentIntentStatus).toBe('succeeded');
+  // Verify the payment intent details
+  expect(paymentIntentResponseBody.status).toBe('succeeded');
+  expect(paymentIntentResponseBody.metadata.payment_channel).toBe('CARD_PRESENT');
+  expect (paymentIntentResponseBody.charges.data[0].payment_method_details.card_present.brand).toBe('visa')
   const transferGroup = paymentIntentResponseBody.transfer_group;
   const paymentTotal = Number(paymentIntentResponseBody.amount);
 

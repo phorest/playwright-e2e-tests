@@ -16,6 +16,9 @@ export const testData = {
     // Stripe Account Details
     SALON_MERCHANT_ACCOUNT_ID: 'ma-MgpDD079KC7dYrpe',
     SALON_CONNECTED_ACCOUNT_ID: 'acct_1PyFcfQTmR91Kbej',
+    TIPPING_STAFF_MERCHANT_ACCOUNT_ID:'ma-vMPD7dr16Ikxejrj',
+    TIPPING_STAFF_CONNECTED_ACCOUNT_ID:'acct_1S0eC032VIP7a7q6',
+    
 
     // Payment Processing Fees
     SALON_VAT_RATE: 23,
@@ -27,6 +30,7 @@ export const testData = {
     
     staff: [
       {
+        // Tipping Staff
         name: "Rachel Testings",
         email: "r.testings@gmail.com",
         id: "c3Bh2MepzG8J88YE6bV1aQ",
