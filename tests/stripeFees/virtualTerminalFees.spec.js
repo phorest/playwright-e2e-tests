@@ -78,7 +78,7 @@ test("Verify Stripe fees applied to a virtual terminal sale. @integratedPurchase
   // Printing required validation data to console
   console.log('The purchase total is '+ purchaseTotal);
   console.log('The payment method amount is '+ paymentMethodAmount);
-  console.log('The payment method transaction ID  is '+ paymentMethodTransactionId);
+  console.log('The payment method transaction ID is '+ paymentMethodTransactionId);
 
   // Uses Stripe simulated terminal to simulate card presentment via Stripe API
   const paymentIntentId = paymentMethodTransactionId

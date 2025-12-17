@@ -84,7 +84,7 @@ test("Process virtual terminal sale. @integratedPurchase", async ({ page, reques
   console.log('The purchase client is '+ purchaseClient);
   console.log('The payment method code is '+ paymentMethodCode);
   console.log('The payment method amount is '+ paymentMethodAmount);
-  console.log('The payment method transaction ID  is '+ paymentMethodTransactionId);
+  console.log('The payment method transaction ID is '+ paymentMethodTransactionId);
 
   // Validate sales screen data - taken from 
   await page.getByRole('link', { name: 'Manager' }).click();

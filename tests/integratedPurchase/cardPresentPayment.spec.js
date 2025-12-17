@@ -91,7 +91,7 @@ test("Process card present sale. @integratedPurchase", async ({ page, request })
   console.log('The purchase client is '+ purchaseClient);
   console.log('The payment method code is '+ paymentMethodCode);
   console.log('The payment method amount is '+ paymentMethodAmount);
-  console.log('The payment method transaction ID  is '+ paymentMethodTransactionId);
+  console.log('The payment method transaction ID is '+ paymentMethodTransactionId);
 
   // Validate sales screen data
   await page.getByRole('link', { name: 'Manager' }).click();
