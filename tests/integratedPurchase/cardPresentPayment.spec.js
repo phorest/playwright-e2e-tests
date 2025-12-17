@@ -5,6 +5,7 @@ import { paySlideoverLocators } from "../../locators/purchase_slideover.locators
 import { testData } from "../../testData/nonTippingUkSalon.js";
 import generalCommands from "../../support/generalCommands.js";
 import { simulateVisaCardPresentment, simulateCardPresentment } from "../../support/stripe commands/cardPresentmentCommands.js";
+import { retrievePaymentIntent } from "../../support/stripe commands/paymentIntent.js";
 import purchasesRequests from "../../support/requests/purchases.requests.js";
 
 const staffEmail = testData.PAY_SALON.staff[0].email;
@@ -92,7 +93,7 @@ test("Process card present sale. @integratedPurchase", async ({ page, request })
   console.log('The payment method amount is '+ paymentMethodAmount);
   console.log('The payment method transaction ID  is '+ paymentMethodTransactionId);
 
-  // Validate sales screen data - taken from 
+  // Validate sales screen data
   await page.getByRole('link', { name: 'Manager' }).click();
   await page.locator("#sales").click();
   const table = page.locator('table');
@@ -126,22 +127,16 @@ test("Process card present sale. @integratedPurchase", async ({ page, request })
   expect(paymentText).toBe(expected);
   expect(paymentMethodTransactionId).toEqual(paymentIntentId)
 
-  // Query the payment intent via Stripe API
-  const paymentIntentResponse = await request.get(
-  `https://api.stripe.com/v1/payment_intents/${paymentIntentId}`,
-  {
-    headers: {
-      authorization: `Bearer ${stripeKey}`,
-    },
-  }
- );
+ // Uses Stripe simulated terminal to simulate card presentment via Stripe API
+  const paymentIntentResponseBody = await retrievePaymentIntent(request, {
+    paymentIntentId: paymentIntentId,
+    stripeKey: stripeKey,
+    retries: 5,
+    interval: 1000
+  });
 
-  // Verify the payment intent is at a completed state
-  expect(paymentIntentResponse.ok()).toBeTruthy();
-  expect(paymentIntentResponse.status()).toBe(200);
-  const paymentIntentResponseBody = await paymentIntentResponse.json();
-  const paymentIntentStatus = paymentIntentResponseBody.status;
-  expect(paymentIntentStatus).toBe('succeeded');
+  // Verify the payment intent details
+  expect(paymentIntentResponseBody.status).toBe('succeeded');
   const transferGroup = paymentIntentResponseBody.transfer_group;
   const paymentTotal = Number(paymentIntentResponseBody.amount);
 

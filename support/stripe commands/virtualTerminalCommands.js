@@ -35,7 +35,7 @@ export async function submitVirtualTerminalCardDetails(page, {
     console.log('Postal code not required for this country');
     }
   
-  console.log(`💳 ${paymentScenario} card details successfully entered`);
+  console.log(`💳 ${paymentScenario} card details entered`);
   await page.locator(paySlideoverLocators.completePaymentButton).click();
   }
 

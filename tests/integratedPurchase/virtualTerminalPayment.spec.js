@@ -6,6 +6,7 @@ import { testData } from "../../testData/nonTippingUkSalon.js";
 import generalCommands from "../../support/generalCommands.js";
 import purchasesRequests from "../../support/requests/purchases.requests.js";
 import { submitVirtualTerminalCardDetails, submitVisaCardDetails } from "../../support/stripe commands/virtualTerminalCommands.js";
+import { retrievePaymentIntent } from "../../support/stripe commands/paymentIntent.js";
 
 const staffEmail = testData.PAY_SALON.staff[0].email;
 const staffPassword = process.env.staffPassword;
@@ -118,23 +119,17 @@ test("Process virtual terminal sale. @integratedPurchase", async ({ page, reques
   expect(paymentText).toBe(expected);
 
 
-  // Query the payment intent via Stripe API
+  // Uses Stripe simulated terminal to simulate card presentment via Stripe API
   const paymentIntentId = paymentMethodTransactionId
-  const paymentIntentResponse = await request.get(
-  `https://api.stripe.com/v1/payment_intents/${paymentIntentId}`,
-  {
-    headers: {
-      authorization: `Bearer ${stripeKey}`,
-    },
-  }
- );
+  const paymentIntentResponseBody = await retrievePaymentIntent(request, {
+    paymentIntentId: paymentIntentId,
+    stripeKey: stripeKey,
+    retries: 5,
+    interval: 1000
+  });
 
-  // Verify the payment intent is at a completed state
-  expect(paymentIntentResponse.ok()).toBeTruthy();
-  expect(paymentIntentResponse.status()).toBe(200);
-  const paymentIntentResponseBody = await paymentIntentResponse.json();
-  const paymentIntentStatus = paymentIntentResponseBody.status;
-  expect(paymentIntentStatus).toBe('succeeded');
+  // Verify the payment intent details
+  expect(paymentIntentResponseBody.status).toBe('succeeded');
   const transferGroup = paymentIntentResponseBody.transfer_group;
   const paymentTotal = Number(paymentIntentResponseBody.amount);
 
