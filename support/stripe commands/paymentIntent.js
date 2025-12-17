@@ -13,7 +13,7 @@ export async function retrievePaymentIntent(request, {
 
   for (let attempt = 1; attempt <= retries; attempt++) {
 
-    const response = await request.post(endpoint, {
+    const response = await request.get(endpoint, {
       headers: {
         'Authorization': `Bearer ${stripeKey}`,
         'Content-Type': 'application/x-www-form-urlencoded'
