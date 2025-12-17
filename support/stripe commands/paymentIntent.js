@@ -41,7 +41,7 @@ export async function retrievePaymentIntent(request, {
       await new Promise(res => setTimeout(res, interval));
     } else {
       throw new Error(
-        `❌ Failed to simulate retrieve payment intent details for ${paymentIntentId}`
+        `❌ Failed to retrieve payment intent details for ${paymentIntentId}`
       );
     }
   }
