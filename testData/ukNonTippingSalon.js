@@ -13,9 +13,20 @@ export const testData = {
     BRANCH_ID: "h6x5cwGfZwHmyoHPpS9Qkw",
     TERMINAL_ID: "tmr_F1ZwQgcHzZY0X5",
 
-    // Stripe Account Details
-    SALON_MERCHANT_ACCOUNT_ID: 'ma-ZJAOKP2Gpf2lM1xw',
-    SALON_CONNECTED_ACCOUNT_ID: 'acct_1PxsBQQHb23tshN1',
+    // Salon Stripe Account Details
+    SALON_NAME: "PAY Automation GB Salon - Branch 1",
+    SALON_MERCHANT_ACCOUNT_ID: "ma-ZJAOKP2Gpf2lM1xw",
+    SALON_CONNECTED_ACCOUNT_ID: "acct_1PxsBQQHb23tshN1",
+
+    // Tipping Staff Strip Account Details
+    TIPPING_STAFF_NAME: "Rebecca Testerson",
+    TIPPING_STAFF_MERCHANT_ACCOUNT_ID:"ma-lwYL5voXeFR3Xvp1",
+    TIPPING_STAFF_CONNECTED_ACCOUNT_ID:"acct_1R6phLQE77faBUAE",
+
+    // MM Staff Strip Account Details
+    MULTI_MERCHANT_STAFF_NAME: "Megan Sampler",
+    MULTI_MERCHANT_STAFF_MERCHANT_ACCOUNT_ID:"ma-onmJpvZKdty7oDR8",
+    MULTI_MERCHANT_STAFF_CONNECTED_ACCOUNT_ID:"acct_1Ree9S4f5yYd627A",
 
     // Payment Processing Fees
     SALON_VAT_RATE: 23,
@@ -41,6 +52,8 @@ export const testData = {
     // Online Booking Threshold Value - the amount over which online booking flat fee and percentage fee values will be charged, otherwise the fee tier amount will be charged
     ONLINE_BOOKING_FLAT_PERCENTAGE_THRESHOLD: 63.5,
 
+    // Minimum paymentIntent amount required to successfully process a payment - GBP
+    MINIMUM_TRANSACTION_VALUE: 0.3,
     
     staff: [
       {

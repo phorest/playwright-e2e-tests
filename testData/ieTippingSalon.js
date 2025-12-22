@@ -13,12 +13,20 @@ export const testData = {
     BRANCH_ID: "c3Bh2MepzG8J88YE6bV1aQ",
     TERMINAL_ID: "tmr_GKt9KQlzOyzlfD",
 
-    // Stripe Account Details
-    SALON_MERCHANT_ACCOUNT_ID: 'ma-MgpDD079KC7dYrpe',
-    SALON_CONNECTED_ACCOUNT_ID: 'acct_1PyFcfQTmR91Kbej',
-    TIPPING_STAFF_MERCHANT_ACCOUNT_ID:'ma-vMPD7dr16Ikxejrj',
-    TIPPING_STAFF_CONNECTED_ACCOUNT_ID:'acct_1S0eC032VIP7a7q6',
-    
+    // Salon Stripe Account Details
+    SALON_NAME: "PAY Automation IE Salon - Branch 1",
+    SALON_MERCHANT_ACCOUNT_ID: "ma-MgpDD079KC7dYrpe",
+    SALON_CONNECTED_ACCOUNT_ID: "acct_1PyFcfQTmR91Kbej",
+
+    // Tipping Staff Strip Account Details
+    TIPPING_STAFF_NAME: "Rachel Testings",
+    TIPPING_STAFF_MERCHANT_ACCOUNT_ID:"ma-vMPD7dr16Ikxejrj",
+    TIPPING_STAFF_CONNECTED_ACCOUNT_ID:"acct_1S0eC032VIP7a7q6",
+
+    // MM Staff Strip Account Details
+    MULTI_MERCHANT_STAFF_NAME: "Michaela Quality",
+    MULTI_MERCHANT_STAFF_MERCHANT_ACCOUNT_ID:"ma-K501EopMEUWE33op",
+    MULTI_MERCHANT_STAFF_CONNECTED_ACCOUNT_ID:"acct_1S0eKi3UU9ObdX4H",
 
     // Payment Processing Fees
     SALON_VAT_RATE: 23,
@@ -43,6 +51,9 @@ export const testData = {
     
     // Online Booking Threshold Value - the amount over which online booking flat fee and percentage fee values will be charged, otherwise the fee tier amount will be charged
     ONLINE_BOOKING_FLAT_PERCENTAGE_THRESHOLD: 50.01,
+
+    // Minimum paymentIntent amount required to successfully process a payment - EUR 
+    MINIMUM_TRANSACTION_VALUE: 0.5,
 
     staff: [
       {
