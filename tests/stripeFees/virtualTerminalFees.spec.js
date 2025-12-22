@@ -2,7 +2,7 @@
 import { test, expect } from "@playwright/test";
 import { loginLocators } from "../../locators/login/login.locators.js";
 import { paySlideoverLocators } from "../../locators/purchase_slideover.locators.js";
-import { testData } from "../../testData/nonTippingUkSalon.js";
+import { testData } from "../../testData/ukNonTippingSalon.js";
 import generalCommands from "../../support/generalCommands.js";
 import purchasesRequests from "../../support/requests/purchases.requests.js";
 import { submitVirtualTerminalCardDetails, submitVisaCardDetails } from "../../support/stripe commands/virtualTerminalCommands.js";
@@ -46,7 +46,7 @@ test("Verify Stripe fees applied to a virtual terminal sale. @integratedPurchase
   await page.getByRole('button', { name: 'JR Jamie Regressionson' }).click();
   await page.getByRole('button', { name: 'Services' }).click();
   await page.getByRole('button', { name: 'Massage' }).click();
-  await page.getByRole('button', { name: 'Neck and Head £65.17 10min' }).click();
+  await page.getByRole('button', { name: 'Neck and Head £65.17 30min' }).click();
   await page.getByRole('button', { name: 'Pay', exact: true }).click();
   await page.locator(paySlideoverLocators.cardPresentButton).click();
 

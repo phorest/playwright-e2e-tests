@@ -1,4 +1,4 @@
-import { testData } from "../../testData/nonTippingUkSalon.js";
+import { testData } from "../../testData/ukNonTippingSalon.js";
 import { purchases } from "../graphQL/queries/purchases.query.js";
 
 /**
