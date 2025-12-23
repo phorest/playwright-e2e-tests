@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test";
-import { testData } from "../testData/salonData.js";
+import { testData } from "../testData/ukNonTippingSalon.js";
 import fs from "fs";
 import path from "path";
 
@@ -38,7 +38,7 @@ class generalCommands {
     if (!revisionKey) {
       await page.goto("/");
     } else {
-      await page.goto(Salon.BASE_URL + "/?revision=" + revisionKey);
+      await page.goto(testData.URL.BASE_URL + "/?revision=" + revisionKey);
     }
   }
 
