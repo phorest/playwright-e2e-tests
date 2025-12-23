@@ -45,7 +45,6 @@ test("Verify Stripe fees applied to an Amex card transaction. @integratedPurchas
   //   "a/" + testData.PAY_SALON.ACCOUNT_ID + "/appointments",
   //   { timeout: 15000 }
   // );
-
   await generalCommands.loginByPass(page, request, staffEmail, staffPassword);
   await generalCommands.loadFeatureFlags(page);
   await page.locator('#main-nav-purchase-link').click();

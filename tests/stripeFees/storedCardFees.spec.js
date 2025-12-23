@@ -28,19 +28,22 @@ const getCurrentDate = () => {
 };
 
 test("Verify Stripe fees applied to a stored card sale. @integratedPurchase @fees", async ({ page, request }) => {
-  await page.goto('/');
+  // await page.goto('/');
+
   // Below steps will be updated once custom commands for login bypass, random staff, random client, random service are ported over to Playwright
-  await page.locator(loginLocators.emailInput).click();
-  await page.locator(loginLocators.emailInput).fill(staffEmail);
-  await page.locator(loginLocators.passwordInput).click();
-  await page.locator(loginLocators.passwordInput).fill(staffPassword);
-  await page.locator(loginLocators.signInButton).click();
-  await page.waitForURL('**/appointments', { timeout: 15000 });
-  await expect(page).toHaveURL(
-    "a/" + testData.PAY_SALON.ACCOUNT_ID + "/appointments",
-    { timeout: 15000 }
-  );
-  await page.getByRole('link', { name: 'Purchase' }).click();
+  // await page.locator(loginLocators.emailInput).click();
+  // await page.locator(loginLocators.emailInput).fill(staffEmail);
+  // await page.locator(loginLocators.passwordInput).click();
+  // await page.locator(loginLocators.passwordInput).fill(staffPassword);
+  // await page.locator(loginLocators.signInButton).click();
+  // await page.waitForURL('**/appointments', { timeout: 15000 });
+  // await expect(page).toHaveURL(
+  //   "a/" + testData.PAY_SALON.ACCOUNT_ID + "/appointments",
+  //   { timeout: 15000 }
+  // );
+  await generalCommands.loginByPass(page, request, staffEmail, staffPassword);
+  await generalCommands.loadFeatureFlags(page);
+  await page.locator('#main-nav-purchase-link').click();
   await page.getByPlaceholder('First name').fill('aoife');
   await page.getByRole('button', { name: 'AT Aoife Test' }).click();
   await page.getByRole('button', { name: 'JR Jamie Regressionson' }).click();

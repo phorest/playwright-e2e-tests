@@ -29,20 +29,22 @@ const getCurrentDate = () => {
 };
 
 test("Process card present sale. @integratedPurchase", async ({ page, request }) => {
-  await page.goto('/');
+  // await page.goto('/');
 
   // Below steps will be updated once custom commands for login bypass, random staff, random client, random service are ported over to Playwright
-  await page.locator(loginLocators.emailInput).click();
-  await page.locator(loginLocators.emailInput).fill(staffEmail);
-  await page.locator(loginLocators.passwordInput).click();
-  await page.locator(loginLocators.passwordInput).fill(staffPassword);
-  await page.locator(loginLocators.signInButton).click();
-  await page.waitForURL('**/appointments', { timeout: 15000 });
-  await expect(page).toHaveURL(
-    "a/" + testData.PAY_SALON.ACCOUNT_ID + "/appointments",
-    { timeout: 15000 }
-  );
-  await page.getByRole('link', { name: 'Purchase' }).click();
+  // await page.locator(loginLocators.emailInput).click();
+  // await page.locator(loginLocators.emailInput).fill(staffEmail);
+  // await page.locator(loginLocators.passwordInput).click();
+  // await page.locator(loginLocators.passwordInput).fill(staffPassword);
+  // await page.locator(loginLocators.signInButton).click();
+  // await page.waitForURL('**/appointments', { timeout: 15000 });
+  // await expect(page).toHaveURL(
+  //   "a/" + testData.PAY_SALON.ACCOUNT_ID + "/appointments",
+  //   { timeout: 15000 }
+  // );
+  await generalCommands.loginByPass(page, request, staffEmail, staffPassword);
+  await generalCommands.loadFeatureFlags(page);
+  await page.locator('#main-nav-purchase-link').click();
   await page.getByPlaceholder('First name').fill('brant');
   await page.getByRole('button', { name: 'BR Brant Rice' }).click();
   await page.getByRole('button', { name: 'JR Jamie Regressionson' }).click();
@@ -94,7 +96,7 @@ test("Process card present sale. @integratedPurchase", async ({ page, request })
   console.log('The payment method transaction ID is '+ paymentMethodTransactionId);
 
   // Validate sales screen data
-  await page.getByRole('link', { name: 'Manager' }).click();
+  await page.locator('#main-nav-manager-link').click();
   await page.locator("#sales").click();
   const table = page.locator('table');
   await expect(table).toBeVisible(); // Putting await so that table validation doesn't fire prior to table actually being visible
